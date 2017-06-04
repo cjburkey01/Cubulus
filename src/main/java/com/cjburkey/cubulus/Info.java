@@ -16,6 +16,4 @@ public final class Info {
 		return b.toString();
 	}
 	
-	
-	
 }
