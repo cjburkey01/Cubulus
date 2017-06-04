@@ -4,10 +4,13 @@ import com.cjburkey.cubulus.Cubulus;
 
 public final class GameLoop {
 	
+	private final boolean outputUps;
+	
 	private Thread thread;
 	private boolean running = false;
 	
-	public GameLoop(int ups, Runnable update) {
+	public GameLoop(int ups, Runnable update, boolean displayUps) {
+		outputUps = displayUps;
 		thread = new Thread(new Call(ups, update));
 	}
 	
@@ -42,7 +45,9 @@ public final class GameLoop {
 				}
 				if(nowSecond - lastSecond >= 1000) {
 					lastSecond = nowSecond;
-					Cubulus.getInstance().getLogger().info("UPS: " + updates);
+					if(outputUps) {
+						Cubulus.getInstance().getLogger().info("UPS: " + updates);
+					}
 					updates = 0;
 				}
 			}
