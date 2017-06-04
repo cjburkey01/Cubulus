@@ -64,7 +64,7 @@ public final class Cubulus {
 		findLogic();
 		logger.info("Finished scan for logic.");
 		infoDump();
-		logger.info("Starting game loop.");
+		logger.info("Starting game loop...");
 		gameLoop();
 		logger.info("Finished prerequisite-initialization.");
 		System.out.println("\n----------[ Begin Game ]----------\n");
