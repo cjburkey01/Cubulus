@@ -1,38 +1,59 @@
 package com.cjburkey.cubulus.logic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import org.lwjgl.glfw.GLFW;
 import com.cjburkey.cubulus.Cubulus;
+import com.cjburkey.cubulus.event.EventHandler;
 
 public class GameLogicCore implements IGameLogic {
 	
-	public boolean init() {
-		Cubulus.getInstance().getLogger().info("Initialized core game.");
+	public void onInit() {
+		Cubulus.info("Initialized core game.");
 		asciiPrint();
-		return true;
+		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_DOWN_EVENT, (data) -> onKeyDown(data.getLong("window"), data.getInt("key")));
+		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_UP_EVENT, (data) -> onKeyUp(data.getLong("window"), data.getInt("key")));
 	}
 	
-	public boolean update() {
-		return false;
+	public void onUpdate() {
+		
 	}
 	
-	public boolean render() {
-		return false;
+	public void onRender() {
+		
+	}
+	
+	public void onCleanup() {
+		Cubulus.info("Cleanup time.");
+	}
+	
+	public void onKeyDown(long window, int key) {
+		if(key == GLFW.GLFW_KEY_ESCAPE) {
+			Cubulus.getInstance().closeGame();
+		}
+	}
+	
+	public void onKeyUp(long window, int key) {
+		
 	}
 	
 	private void asciiPrint() {
-		Cubulus.getInstance().getLogger().info("Printing some fun ascii text:");
+		Cubulus.info("Printing some fun ascii text:");
 		String file = "/ascii.txt";
 		try {
 			Scanner scanner = new Scanner(getClass().getResourceAsStream(file));
+			List<String> output = new ArrayList<>();
 			while(scanner.hasNextLine()) {
-				System.out.println(scanner.nextLine());
-				Thread.sleep(250);
+				output.add(scanner.nextLine());
 			}
 			scanner.close();
+			for(String s : output) {
+				System.out.println("\t" + s);
+			}
 		} catch(Exception e) {
 			Cubulus.getInstance().error(-2, false, e);
 		}
-		Cubulus.getInstance().getLogger().info("Done.");
 	}
 	
 }

@@ -10,7 +10,9 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.reflections.Reflections;
 import com.cjburkey.cubulus.core.GameLoop;
+import com.cjburkey.cubulus.event.EventHandler;
 import com.cjburkey.cubulus.logic.IGameLogic;
+import com.cjburkey.cubulus.render.Renderer;
 import com.cjburkey.cubulus.window.Window;
 
 public final class Cubulus {
@@ -19,10 +21,15 @@ public final class Cubulus {
 	private static Cubulus instance;
 	private Logger logger;
 	private Window window;
+	private Renderer renderer;
 	private GameLoop gameLoop;
 	private List<IGameLogic> logic;
+	private boolean rendering;
+	private EventHandler eventHandler;
 	
 	public static void main(String[] args) {
+		Thread.setDefaultUncaughtExceptionHandler((t, e) -> instance.error(Short.MAX_VALUE, true, e));
+		System.out.println("Set default error handling.");
 		boolean log = false;
 		if(args.length > 0) {
 			if(args[0].trim().equals("completeInformationLog")) {
@@ -30,7 +37,7 @@ public final class Cubulus {
 			}
 		}
 		instance = new Cubulus(log);
-		instance.init();
+		instance.start();
 	}
 	
 	public Cubulus(boolean fullLog) {
@@ -52,11 +59,17 @@ public final class Cubulus {
 		return logger;
 	}
 	
-	private void init() {
+	public EventHandler getEventHandler() {
+		return eventHandler;
+	}
+	
+	private void start() {
+		long start = System.currentTimeMillis();
 		System.out.println("Building logger...");
 		logger = new Logger("[Cubulus] %s");
 		logger.info("Logger built.");
 		logic = new ArrayList<>();
+		eventHandler = new EventHandler();
 		logger.info("Launching...");
 		launch();
 		logger.info("Launched.");
@@ -66,9 +79,15 @@ public final class Cubulus {
 		infoDump();
 		logger.info("Starting game loop...");
 		gameLoop();
-		logger.info("Finished prerequisite-initialization.");
+		long now = System.currentTimeMillis();
+		logger.info("Finished prerequisite-initialization. Took: " + (now - start) + "ms.");
+		finish();
+	}
+	
+	private void finish() {
 		System.out.println("\n----------[ Begin Game ]----------\n");
 		startRenderLoop();
+		logicCleanup();
 		logger.info("Stopped.");
 		System.exit(0);
 	}
@@ -92,15 +111,21 @@ public final class Cubulus {
 		gameLoop.start();
 	}
 	
+	public void closeGame() {
+		logger.info("Calmly closing game...");
+		gameLoop.stop();
+		rendering = false;
+	}
+	
 	private void logicInit() {
 		for(IGameLogic l : logic) {
-			l.init();
+			l.onInit();
 		}
 	}
 	
 	private void logicRender() {
 		for(IGameLogic l : logic) {
-			l.render();
+			l.onRender();
 		}
 	}
 	
@@ -111,7 +136,13 @@ public final class Cubulus {
 			logicInit();
 		}
 		for(IGameLogic l : logic) {
-			l.update();
+			l.onUpdate();
+		}
+	}
+	
+	private void logicCleanup() {
+		for(IGameLogic l : logic) {
+			l.onCleanup();
 		}
 	}
 	
@@ -133,26 +164,45 @@ public final class Cubulus {
 	
 	private void launch() {
 		window = new Window(300, 300, "Cubulus v" + Info.getGameVersion(), true);
+		window.setSize(true, window.getMonitorWidth() * 2 / 3, window.getMonitorHeight() * 2 / 3);
 		GL.createCapabilities();
-		GL11.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		renderer = new Renderer();
+		renderer.init();
 	}
 	
 	private void startRenderLoop() {
-		while(!GLFW.glfwWindowShouldClose(window.getWindow())) {
+		rendering = true;
+		while(rendering) {
+			if(GLFW.glfwWindowShouldClose(window.getWindow())) {
+				closeGame();
+			}
 			renderLoop();
 		}
 		logger.info("Stopping...");
 	}
 	
 	private void renderLoop() {
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+		if(window.isResized()) {
+			window.cancelResize();
+			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
+			setBuiltWindowTitle();
+		}
+		logicRender();
+		renderer.clear();
 		GLFW.glfwSwapBuffers(window.getWindow());
 		GLFW.glfwPollEvents();
-		logicRender();
+	}
+	
+	private void setBuiltWindowTitle() {
+		window.setTitle("Cubulus v" + Info.getGameVersion() + " (" + window.getWidth() + ", " + window.getHeight() + ")");
 	}
 	
 	public static Cubulus getInstance() {
 		return instance;
+	}
+	
+	public static void info(Object msg) {
+		instance.logger.info(msg);
 	}
 	
 }

@@ -46,7 +46,7 @@ public final class GameLoop {
 				if(nowSecond - lastSecond >= 1000) {
 					lastSecond = nowSecond;
 					if(outputUps) {
-						Cubulus.getInstance().getLogger().info("UPS: " + updates);
+						Cubulus.info("UPS: " + updates);
 					}
 					updates = 0;
 				}
