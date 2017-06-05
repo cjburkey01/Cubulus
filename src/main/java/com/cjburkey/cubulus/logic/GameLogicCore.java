@@ -31,7 +31,7 @@ public final class GameLogicCore implements IGameLogic {
 	
 	private void spawnMeshes(boolean clear) {
 		final Mesh textured = new MeshTestCube("/texture/stone.png");
-		final Mesh colored = new MeshTestCube(new Vector3f(0.5f, 0.6f, 0.7f));
+		final Mesh colored = new MeshTestCube(new Vector3f(1f, 0.5f, 0.5f));
 		/*if(clear) {
 			gameItems.clear();
 		}
@@ -39,7 +39,7 @@ public final class GameLogicCore implements IGameLogic {
 			Vector3f pos = new Vector3f(Utils.randomRangef(-10.0f, 10.0f, true), 0.0f, Utils.randomRangef(-10.0f, 10.0f, true));
 			spawnGameObject((Utils.randomRangei(0, 1, true) == 1) ? textured : colored);
 		}*/
-		int radius = 50;
+		int radius = 5;
 		for(int x = -radius; x <= radius; x ++) {
 			for(int z = -radius; z <= radius; z ++) {
 				spawnGameObject(new Vector3f(x, 0, z), (Utils.randomRangei(0, 1, true) == 1) ? textured : colored);
@@ -53,10 +53,15 @@ public final class GameLogicCore implements IGameLogic {
 		gameItems.add(item);
 	}
 	
+	private float x = 0;
 	public void onGameUpdate() {
 		if(renderer != null && renderer.getCamera() != null) {
+			x = Utils.wrap(x + 1f, 0.0f, 360.0f);
 			for(GameObject item : gameItems) {
-				item.getRotation().y += 0.5f;
+				item.getRotation().x = Utils.wrap(item.getRotation().x + 1.0f, 0.0f, 360.0f);
+				item.getRotation().y = Utils.wrap(item.getRotation().y + 3.0f, 0.0f, 360.0f);
+				item.getRotation().z = Utils.wrap(item.getRotation().z + 6.0f, 0.0f, 360.0f);
+				item.getPosition().y = (float) Math.sin(Math.toRadians(x)) * (item.getPosition().x - item.getPosition().z);
 			}
 			processInput(Cubulus.getGameWindow(), Cubulus.getGameWindow().getInput().getMouseHandler(), Cubulus.getGameWindow().getInput().getKeyboardHandler());
 			renderer.getCamera().move(cameraInc.x * CAM_MOVE_SPEED, cameraInc.y * CAM_MOVE_SPEED, cameraInc.z * CAM_MOVE_SPEED);
