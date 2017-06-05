@@ -30,19 +30,26 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	private void spawnMeshes(boolean clear) {
-		if(clear) {
+		final Mesh textured = new MeshTestCube("/texture/stone.png");
+		final Mesh colored = new MeshTestCube(new Vector3f(0.5f, 0.6f, 0.7f));
+		/*if(clear) {
 			gameItems.clear();
 		}
-		Mesh textured = new MeshTestCube("/texture/stone.png");
-		Mesh colored = new MeshTestCube(new Vector3f(0.5f, 0.6f, 0.7f));
 		for(int i = 0; i < 10; i ++) {
-			spawnMeshInstance((Utils.randomRangei(0, 1, true) == 1) ? textured : colored);
+			Vector3f pos = new Vector3f(Utils.randomRangef(-10.0f, 10.0f, true), 0.0f, Utils.randomRangef(-10.0f, 10.0f, true));
+			spawnGameObject((Utils.randomRangei(0, 1, true) == 1) ? textured : colored);
+		}*/
+		int radius = 50;
+		for(int x = -radius; x <= radius; x ++) {
+			for(int z = -radius; z <= radius; z ++) {
+				spawnGameObject(new Vector3f(x, 0, z), (Utils.randomRangei(0, 1, true) == 1) ? textured : colored);
+			}
 		}
 	}
 	
-	private void spawnMeshInstance(Mesh mesh) {
+	private void spawnGameObject(Vector3f pos, Mesh mesh) {
 		GameObject item = new GameObject(mesh);
-		item.setPosition(Utils.randomRangef(-10.0f, 10.0f, true), 0.0f, Utils.randomRangef(-10.0f, 10.0f, true));
+		item.setPosition(pos.x, pos.y, pos.z);
 		gameItems.add(item);
 	}
 	
