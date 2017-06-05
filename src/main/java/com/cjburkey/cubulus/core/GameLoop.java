@@ -9,9 +9,10 @@ public final class GameLoop {
 	private Thread thread;
 	private boolean running = false;
 	
-	public GameLoop(int ups, Runnable update, boolean displayUps) {
+	public GameLoop(String name, int ups, Runnable update, boolean displayUps) {
 		outputUps = displayUps;
 		thread = new Thread(new Call(ups, update));
+		thread.setName(name);
 	}
 	
 	public void start() {

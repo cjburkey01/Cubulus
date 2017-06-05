@@ -9,18 +9,23 @@ import com.cjburkey.cubulus.event.EventHandler;
 
 public class GameLogicCore implements IGameLogic {
 	
-	public void onInit() {
-		Cubulus.info("Initialized core game.");
-		asciiPrint();
-		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_DOWN_EVENT, (data) -> onKeyDown(data.getLong("window"), data.getInt("key")));
-		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_UP_EVENT, (data) -> onKeyUp(data.getLong("window"), data.getInt("key")));
-	}
-	
 	public void onUpdate() {
 		
 	}
 	
+	public void onGameInit() {
+		Cubulus.info("Initialized core game.");
+		asciiPrint();
+		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_DOWN_EVENT, (data) -> onKeyDown(data.getLong("window"), data.getInt("key")));
+		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_UP_EVENT, (data) -> onKeyUp(data.getLong("window"), data.getInt("key")));
+		
+	}
+	
 	public void onRender() {
+		
+	}
+	
+	public void onRenderInit() {
 		
 	}
 	

@@ -107,7 +107,7 @@ public final class Cubulus {
 	}
 	
 	private void gameLoop() {
-		gameLoop = new GameLoop(60, () -> logicUpdate(), false);
+		gameLoop = new GameLoop("UpdateLoop Thread", 60, () -> logicUpdate(), false);
 		gameLoop.start();
 	}
 	
@@ -117,15 +117,15 @@ public final class Cubulus {
 		rendering = false;
 	}
 	
-	private void logicInit() {
+	private void logicGameInit() {
 		for(IGameLogic l : logic) {
-			l.onInit();
+			l.onGameInit();
 		}
 	}
 	
-	private void logicRender() {
+	private void logicRenderInit() {
 		for(IGameLogic l : logic) {
-			l.onRender();
+			l.onRenderInit();
 		}
 	}
 	
@@ -133,10 +133,21 @@ public final class Cubulus {
 	private void logicUpdate() {
 		if(firstUpdate) {
 			firstUpdate = false;
-			logicInit();
+			logicGameInit();
 		}
 		for(IGameLogic l : logic) {
 			l.onUpdate();
+		}
+	}
+	
+	private boolean firstRender = true;
+	private void logicRender() {
+		if(firstRender) {
+			firstRender = false;
+			logicRenderInit();
+		}
+		for(IGameLogic l : logic) {
+			l.onRender();
 		}
 	}
 	
@@ -187,8 +198,9 @@ public final class Cubulus {
 			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
 			setBuiltWindowTitle();
 		}
-		logicRender();
 		renderer.clear();
+		renderer.render();
+		logicRender();
 		GLFW.glfwSwapBuffers(window.getWindow());
 		GLFW.glfwPollEvents();
 	}
