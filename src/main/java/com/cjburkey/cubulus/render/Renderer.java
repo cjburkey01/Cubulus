@@ -10,7 +10,7 @@ import com.cjburkey.cubulus.shader.ShaderProgram;
 
 public final class Renderer {
 	
-	private static final float FOV = (float) Math.toRadians(60.0f);
+	private static final float FOV = (float) Math.toRadians(90.0f);
 	private static final float Z_NEAR = 0.01f;
 	private static final float Z_FAR = 1000.f;
 	
@@ -27,6 +27,7 @@ public final class Renderer {
 			shaderBasic.link();
 			shaderBasic.createUniform("projectionMatrix");
 			shaderBasic.createUniform("worldMatrix");
+			shaderBasic.createUniform("texture_sampler");
 		} catch(Exception e) {
 			Cubulus.getInstance().error(-182, true, "Could not load shader.");
 		}
@@ -37,6 +38,7 @@ public final class Renderer {
 		shaderBasic.bind();
 		Matrix4f projection = transform.getProjectionMatrix(FOV, Cubulus.getGameWindow().getWidth(), Cubulus.getGameWindow().getHeight(), Z_NEAR, Z_FAR);
 		shaderBasic.setUniform("projectionMatrix", projection);
+		shaderBasic.setUniform("texture_sampler", 0);
 		for(GameItem item : gameItems) {
 			Matrix4f world = transform.getWorldMatrix(item.getPosition(), item.getRotation(), item.getScale());
 			shaderBasic.setUniform("worldMatrix", world);
@@ -46,7 +48,7 @@ public final class Renderer {
 	}
 	
 	private void clear() {
-		GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 	}
 	

@@ -3,20 +3,25 @@ package com.cjburkey.cubulus.object;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
+import com.cjburkey.cubulus.render.Texture;
 
 public class Mesh {
 	
 	private final int vao;
 	private final int vbo;
 	private final int idxVbo;
-	private final int colorVbo;
+	private final int uvVbo;
 	private final int vertCount;
+	private final Texture texture;
 	
-	public Mesh(float[] verts, float[] color, int[] inds) {
+	public Mesh(float[] verts, float[] uvs, int[] inds, Texture texture) {
+		this.texture = texture;
+		
 		FloatBuffer vertBuffer = MemoryUtil.memAllocFloat(verts.length);
 		vertCount = inds.length;
 		vertBuffer.put(verts).flip();
@@ -37,12 +42,12 @@ public class Mesh {
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indBuffer, GL15.GL_STATIC_DRAW);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		
-		colorVbo = GL15.glGenBuffers();
-		FloatBuffer colorBuffer = MemoryUtil.memAllocFloat(color.length);
-		colorBuffer.put(color).flip();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, colorVbo);
+		uvVbo = GL15.glGenBuffers();
+		FloatBuffer colorBuffer = MemoryUtil.memAllocFloat(uvs.length);
+		colorBuffer.put(uvs).flip();
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, uvVbo);
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorBuffer, GL15.GL_STATIC_DRAW);
-		GL20.glVertexAttribPointer(1, 3, GL11.GL_FLOAT, false, 0, 0);
+		GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 0, 0);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		
 		GL30.glBindVertexArray(0);
@@ -65,6 +70,8 @@ public class Mesh {
 	}
 	
 	public void render() {
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getTextureId());
 		GL30.glBindVertexArray(getVaoId());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
@@ -80,7 +87,7 @@ public class Mesh {
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		GL15.glDeleteBuffers(vbo);
 		GL15.glDeleteBuffers(idxVbo);
-		GL15.glDeleteBuffers(colorVbo);
+		GL15.glDeleteBuffers(uvVbo);
 		
 		GL30.glBindVertexArray(0);
 		GL30.glDeleteVertexArrays(vao);

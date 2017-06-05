@@ -8,6 +8,7 @@ public final class GameLoop {
 	
 	private Thread thread;
 	private boolean running = false;
+	private int ups;
 	
 	public GameLoop(String name, int ups, Runnable update, boolean displayUps) {
 		outputUps = displayUps;
@@ -24,6 +25,10 @@ public final class GameLoop {
 		running = false;
 	}
 	
+	public int getUpdatesPerSecond() {
+		return ups;
+	}
+	
 	private class Call implements Runnable {
 		private double step = 0.0d;
 		private Runnable update;
@@ -35,7 +40,7 @@ public final class GameLoop {
 		public void run() {
 			long lastUpdate = System.nanoTime();
 			long lastSecond = System.currentTimeMillis();
-			long updates = 0;
+			int updates = 0;
 			while(running) {
 				long nowUpdate = System.nanoTime();
 				long nowSecond = System.currentTimeMillis();
@@ -46,10 +51,11 @@ public final class GameLoop {
 				}
 				if(nowSecond - lastSecond >= 1000) {
 					lastSecond = nowSecond;
-					if(outputUps) {
-						Cubulus.info("UPS: " + updates);
-					}
+					ups = updates;
 					updates = 0;
+					if(outputUps) {
+						Cubulus.info("UPS: " + ups);
+					}
 				}
 			}
 		}

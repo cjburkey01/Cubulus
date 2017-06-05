@@ -12,6 +12,7 @@
 		<joml.version>1.9.3</joml.version>
 		<steamworks4j.version>1.6.2</steamworks4j.version>
 		<reflections.version>0.9.11</reflections.version>
+		<pngdecoder.version>1.0</pngdecoder.version>
 	</properties>
 	
 	<dependencies>
@@ -290,7 +291,12 @@
 			<artifactId>reflections</artifactId>
 			<version>${reflections.version}</version>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>org.l33tlabs.twl</groupId>
+			<artifactId>pngdecoder</artifactId>
+			<version>${pngdecoder.version}</version>
+			</dependency>
+		</dependencies>
 	<repositories>
 		<repository>
 			<id>sonatype-snapshots</id>

@@ -16,6 +16,8 @@ import com.cjburkey.cubulus.window.Window;
 
 public final class Cubulus {
 	
+	private static final boolean vsync = true;	// Keep this on, if off, the game will jump a little bit every once in a while.
+	
 	private boolean fullInfoDump;
 	private static Cubulus instance;
 	private Logger logger;
@@ -147,6 +149,7 @@ public final class Cubulus {
 	private void logicRender() {
 		if(firstRender) {
 			firstRender = false;
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
 			logicRenderInit();
 		}
 		for(IGameLogic l : logic) {
@@ -177,11 +180,14 @@ public final class Cubulus {
 	}
 	
 	private void launch() {
-		window = new Window(300, 300, "Cubulus v" + Info.getGameVersion(), true);
+		window = new Window(300, 300, "Cubulus v" + Info.getGameVersion(), vsync);
 		window.setSize(true, window.getMonitorWidth() * 2 / 3, window.getMonitorHeight() * 2 / 3);
 		GL.createCapabilities();
 	}
 	
+	private int fps = 0;
+	private int frames = 0;
+	private long lastFps = System.nanoTime();
 	private void startRenderLoop() {
 		rendering = true;
 		while(rendering) {
@@ -189,6 +195,14 @@ public final class Cubulus {
 				closeGame();
 			}
 			renderLoop();
+			frames++;
+			long now = System.nanoTime();
+			if(now - lastFps >= 1000000000) {
+				fps = frames;
+				frames = 0;
+				lastFps = now;
+			}
+			try { Thread.sleep(1); } catch(Exception e) { System.exit(-134); }
 		}
 		logger.info("Stopping...");
 	}
@@ -197,15 +211,16 @@ public final class Cubulus {
 		if(window.isResized()) {
 			window.cancelResize();
 			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
-			setBuiltWindowTitle();
 		}
+		setBuiltWindowTitle();
 		logicRender();
 		GLFW.glfwSwapBuffers(window.getWindow());
 		GLFW.glfwPollEvents();
 	}
 	
 	private void setBuiltWindowTitle() {
-		window.setTitle("Cubulus v" + Info.getGameVersion() + " (" + window.getWidth() + ", " + window.getHeight() + ")");
+		int ups = gameLoop.getUpdatesPerSecond();
+		window.setTitle("Cubulus v" + Info.getGameVersion() + " (" + window.getWidth() + "x" + window.getHeight() + ") [FPS: " + fps + ", UPS: " + ups + "]");
 	}
 	
 	public static Cubulus getInstance() {
