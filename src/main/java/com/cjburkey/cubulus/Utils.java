@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
+import com.cjburkey.cubulus.resource.ResourceHandler;
 
 public final class Utils {
 	
-	public static String loadResource(String path) throws Exception {
+	public static String loadResourceAsString(String loc) throws Exception {
 		StringBuilder out = new StringBuilder();
-		Scanner scanner = new Scanner(Utils.class.getResourceAsStream(path));
+		Scanner scanner = new Scanner(ResourceHandler.getInstance().getStream(loc));
 		while(scanner.hasNextLine()) {
 			out.append(scanner.nextLine() + '\n');
 		}
@@ -17,9 +18,9 @@ public final class Utils {
 		return out.toString();
 	}
 	
-	public static List<String> loadResourceLines(String path) throws Exception {
+	public static List<String> loadResourceAsLines(String loc) throws Exception {
 		List<String> out = new ArrayList<>();
-		Scanner scanner = new Scanner(Utils.class.getResourceAsStream(path));
+		Scanner scanner = new Scanner(ResourceHandler.getInstance().getStream(loc));
 		while(scanner.hasNextLine()) {
 			out.add(scanner.nextLine() + '\n');
 		}

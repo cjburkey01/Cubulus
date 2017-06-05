@@ -1,12 +1,13 @@
-package com.cjburkey.cubulus;
+package com.cjburkey.cubulus.core;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.reflections.Reflections;
+import com.cjburkey.cubulus.Cubulus;
 import com.cjburkey.cubulus.logic.IGameLogic;
 
-public class CoreEventDispatcher {
+public final class CoreEventDispatcher {
 	
 	private final List<IGameLogic> logic;
 	

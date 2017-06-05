@@ -5,8 +5,10 @@ import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
+import com.cjburkey.cubulus.core.CoreEventDispatcher;
 import com.cjburkey.cubulus.core.GameLoop;
 import com.cjburkey.cubulus.event.EventHandler;
+import com.cjburkey.cubulus.resource.ResourceHandler;
 import com.cjburkey.cubulus.window.Window;
 
 public final class Cubulus {
@@ -21,6 +23,7 @@ public final class Cubulus {
 	private boolean rendering;
 	private EventHandler eventHandler;
 	private CoreEventDispatcher logicEvents;
+	private ResourceHandler resHandle;
 	
 	public static void main(String[] args) {
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> instance.error(Short.MAX_VALUE, true, e));
@@ -62,13 +65,20 @@ public final class Cubulus {
 		return eventHandler;
 	}
 	
+	public ResourceHandler getResourceHandler() {
+		return resHandle;
+	}
+	
 	private void start() {
 		long start = System.currentTimeMillis();
 		System.out.println("Building logger...");
 		logger = new Logger("[Cubulus] %s");
 		logger.info("Logger built.");
+		logger.info("Building event handlers...");
 		logicEvents = new CoreEventDispatcher();
+		resHandle = new ResourceHandler();
 		eventHandler = new EventHandler();
+		logger.info("Built event handlers.");
 		logger.info("Launching...");
 		launch();
 		logger.info("Launched.");

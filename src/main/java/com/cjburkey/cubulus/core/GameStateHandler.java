@@ -1,7 +1,8 @@
-package com.cjburkey.cubulus;
+package com.cjburkey.cubulus.core;
 
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
+import com.cjburkey.cubulus.Cubulus;
 import com.cjburkey.cubulus.input.MouseHandler;
 import com.cjburkey.cubulus.window.Window;
 

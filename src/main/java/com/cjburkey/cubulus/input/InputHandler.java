@@ -1,6 +1,6 @@
 package com.cjburkey.cubulus.input;
 
-public class InputHandler {
+public final class InputHandler {
 	
 	private KeyboardHandler keyboard;
 	private MouseHandler mouse;

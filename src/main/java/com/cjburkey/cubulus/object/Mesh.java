@@ -21,7 +21,7 @@ public class Mesh {
 	private final Vector3f color;
 	private final Texture texture;
 	
-	public Mesh(float[] verts, float[] normals, float[] uvs, int[] inds, Texture texture) {
+	public Mesh(float[] verts, float[] normals, float[] uvs, int[] inds, String texture) {
 		this(verts, normals, uvs, inds, texture, new Vector3f());
 	}
 	
@@ -29,8 +29,12 @@ public class Mesh {
 		this(verts, normals, uvs, inds, null, color);
 	}
 	
-	private Mesh(float[] verts, float[] normals, float[] uvs, int[] inds, Texture texture, Vector3f color) {
-		this.texture = texture;
+	private Mesh(float[] verts, float[] normals, float[] uvs, int[] inds, String texture, Vector3f color) {
+		if(texture == null) {
+			this.texture = null;
+		} else {
+			this.texture = new Texture(texture);
+		}
 		this.color = color;
 		
 		FloatBuffer vertBuffer = MemoryUtil.memAllocFloat(verts.length);

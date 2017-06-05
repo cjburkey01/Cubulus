@@ -4,10 +4,10 @@ import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import com.cjburkey.cubulus.Cubulus;
-import com.cjburkey.cubulus.GameStateHandler;
+import com.cjburkey.cubulus.core.GameStateHandler;
 import com.cjburkey.cubulus.window.Window;
 
-public class MouseHandler {
+public final class MouseHandler {
 	
 	private final Vector2d prevPos;
 	private final Vector2d pos;

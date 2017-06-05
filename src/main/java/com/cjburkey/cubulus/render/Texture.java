@@ -1,20 +1,23 @@
 package com.cjburkey.cubulus.render;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import com.cjburkey.cubulus.Cubulus;
+import com.cjburkey.cubulus.resource.ResourceHandler;
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
-public class Texture {
+public final class Texture {
 	
 	private PNGDecoder decoder;
 	private int texture;
 	
 	public Texture(String path) {
 		try {
-			decoder = new PNGDecoder(Texture.class.getResourceAsStream(path));
+			InputStream stream = ResourceHandler.getInstance().getStream(path);
+			decoder = new PNGDecoder(stream);
 			sendToGpu();
 		} catch (Exception e) {
 			error(path, e);

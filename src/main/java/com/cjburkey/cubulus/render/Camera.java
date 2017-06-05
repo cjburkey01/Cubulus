@@ -2,7 +2,7 @@ package com.cjburkey.cubulus.render;
 
 import org.joml.Vector3f;
 
-public class Camera {
+public final class Camera {
 	
 	private final Vector3f position;
 	private final Vector3f rotation;

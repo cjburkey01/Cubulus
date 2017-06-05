@@ -6,14 +6,15 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import com.cjburkey.cubulus.Cubulus;
-import com.cjburkey.cubulus.GameStateHandler;
 import com.cjburkey.cubulus.Utils;
+import com.cjburkey.cubulus.block.Blocks;
+import com.cjburkey.cubulus.chunk.MeshChunk;
+import com.cjburkey.cubulus.core.GameStateHandler;
 import com.cjburkey.cubulus.event.EventHandler;
 import com.cjburkey.cubulus.input.KeyboardHandler;
 import com.cjburkey.cubulus.input.MouseHandler;
 import com.cjburkey.cubulus.object.GameObject;
 import com.cjburkey.cubulus.object.Mesh;
-import com.cjburkey.cubulus.object.MeshTestCube;
 import com.cjburkey.cubulus.render.Renderer;
 import com.cjburkey.cubulus.window.Window;
 
@@ -26,43 +27,18 @@ public final class GameLogicCore implements IGameLogic {
 	private final float CAM_ROT_SPEED = 0.25f;
 	
 	public GameLogicCore() {
-		spawnMeshes(true);
+		MeshChunk chunk = new MeshChunk("cubulus:texture/block/block_stone.png");
+		spawnChunk(new Vector3f(0, 0, 0), chunk);
 	}
 	
-	private void spawnMeshes(boolean clear) {
-		final Mesh textured = new MeshTestCube("/texture/stone.png");
-		final Mesh colored = new MeshTestCube(new Vector3f(1f, 0.5f, 0.5f));
-		/*if(clear) {
-			gameItems.clear();
-		}
-		for(int i = 0; i < 10; i ++) {
-			Vector3f pos = new Vector3f(Utils.randomRangef(-10.0f, 10.0f, true), 0.0f, Utils.randomRangef(-10.0f, 10.0f, true));
-			spawnGameObject((Utils.randomRangei(0, 1, true) == 1) ? textured : colored);
-		}*/
-		int radius = 5;
-		for(int x = -radius; x <= radius; x ++) {
-			for(int z = -radius; z <= radius; z ++) {
-				spawnGameObject(new Vector3f(x, 0, z), (Utils.randomRangei(0, 1, true) == 1) ? textured : colored);
-			}
-		}
-	}
-	
-	private void spawnGameObject(Vector3f pos, Mesh mesh) {
+	private void spawnChunk(Vector3f pos, Mesh mesh) {
 		GameObject item = new GameObject(mesh);
 		item.setPosition(pos.x, pos.y, pos.z);
 		gameItems.add(item);
 	}
 	
-	private float x = 0;
 	public void onGameUpdate() {
 		if(renderer != null && renderer.getCamera() != null) {
-			x = Utils.wrap(x + 1f, 0.0f, 360.0f);
-			for(GameObject item : gameItems) {
-				item.getRotation().x = Utils.wrap(item.getRotation().x + 1.0f, 0.0f, 360.0f);
-				item.getRotation().y = Utils.wrap(item.getRotation().y + 3.0f, 0.0f, 360.0f);
-				item.getRotation().z = Utils.wrap(item.getRotation().z + 6.0f, 0.0f, 360.0f);
-				item.getPosition().y = (float) Math.sin(Math.toRadians(x)) * (item.getPosition().x - item.getPosition().z);
-			}
 			processInput(Cubulus.getGameWindow(), Cubulus.getGameWindow().getInput().getMouseHandler(), Cubulus.getGameWindow().getInput().getKeyboardHandler());
 			renderer.getCamera().move(cameraInc.x * CAM_MOVE_SPEED, cameraInc.y * CAM_MOVE_SPEED, cameraInc.z * CAM_MOVE_SPEED);
 			Vector2f rot = Cubulus.getGameWindow().getInput().getMouseHandler().getDisplayVector();
@@ -96,6 +72,7 @@ public final class GameLogicCore implements IGameLogic {
 	
 	public void onGameInit() {
 		Cubulus.info("Initialized core game.");
+		Blocks.initBlocks();
 		GameStateHandler.unPause();
 		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_DOWN_EVENT, (data) -> onKeyDown(data.getLong("window"), data.getInt("key")));
 		Cubulus.getGameWindow().getInput().getMouseHandler().init(Cubulus.getGameWindow());
@@ -126,14 +103,14 @@ public final class GameLogicCore implements IGameLogic {
 			Cubulus.getInstance().closeGame();
 			return;
 		}
-		if(key == GLFW.GLFW_KEY_R) {
+		/*if(key == GLFW.GLFW_KEY_R) {
 			spawnMeshes(true);
 			return;
 		}
 		if(key == GLFW.GLFW_KEY_F) {
 			spawnMeshes(false);
 			return;
-		}
+		}*/
 		if(key == GLFW.GLFW_KEY_ESCAPE) {
 			if(GameStateHandler.isPaused()) {
 				GameStateHandler.unPause();

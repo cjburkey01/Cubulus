@@ -24,8 +24,8 @@ public final class Renderer {
 		
 		try {
 			shaderBasic = new ShaderProgram();
-			shaderBasic.createVertex(Utils.loadResource("/shader/basic/basic.vs"));
-			shaderBasic.createFragment(Utils.loadResource("/shader/basic/basic.fs"));
+			shaderBasic.createVertex(Utils.loadResourceAsString("cubulus:shader/basic/basicVertex.vs"));
+			shaderBasic.createFragment(Utils.loadResourceAsString("cubulus:shader/basic/basicFragment.fs"));
 			shaderBasic.link();
 			shaderBasic.createUniform("projectionMatrix");
 			shaderBasic.createUniform("modelViewMatrix");

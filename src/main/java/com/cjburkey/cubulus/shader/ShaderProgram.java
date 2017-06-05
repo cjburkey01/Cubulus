@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryStack;
 import com.cjburkey.cubulus.Cubulus;
 
-public class ShaderProgram {
+public final class ShaderProgram {
 	
 	private final HashMap<String, Integer> uniforms;
 	private final int program;
