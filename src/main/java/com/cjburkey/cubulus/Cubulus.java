@@ -81,8 +81,6 @@ public final class Cubulus {
 		findLogic();
 		logger.info("Finished scan for logic.");
 		infoDump();
-		logger.info("Starting game loop...");
-		gameLoop();
 		long now = System.currentTimeMillis();
 		logger.info("Finished prerequisite-initialization. Took: " + (now - start) + "ms.");
 		finish();
@@ -141,7 +139,7 @@ public final class Cubulus {
 			firstUpdate = false;
 			logicGameInit();
 		}
-		window.getInput().getMouseHandler().update(window.getWindow());
+		window.getInput().getMouseHandler().update();
 		for(IGameLogic l : logic) {
 			l.onUpdate();
 		}
@@ -184,6 +182,7 @@ public final class Cubulus {
 	private void launch() {
 		window = new Window(300, 300, "Cubulus v" + Info.getGameVersion(), vsync);
 		window.setSize(true, window.getMonitorWidth() * 2 / 3, window.getMonitorHeight() * 2 / 3);
+		//GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 		GL.createCapabilities();
 	}
 	
@@ -192,6 +191,8 @@ public final class Cubulus {
 	private long lastFps = System.nanoTime();
 	private void startRenderLoop() {
 		rendering = true;
+		logger.info("Starting game loop...");
+		gameLoop();
 		while(rendering) {
 			if(GLFW.glfwWindowShouldClose(window.getWindow())) {
 				closeGame();

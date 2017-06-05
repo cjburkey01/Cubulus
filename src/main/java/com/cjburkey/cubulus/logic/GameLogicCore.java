@@ -34,13 +34,15 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void onUpdate() {
-		for(GameItem item : gameItems) {
-			item.getRotation().y += 0.5f;
+		if(renderer != null && renderer.getCamera() != null) {
+			for(GameItem item : gameItems) {
+				item.getRotation().y += 0.5f;
+			}
+			processInput(Cubulus.getGameWindow(), Cubulus.getGameWindow().getInput().getMouseHandler(), Cubulus.getGameWindow().getInput().getKeyboardHandler());
+			renderer.getCamera().move(cameraInc.x * CAM_MOVE_SPEED, cameraInc.y * CAM_MOVE_SPEED, cameraInc.z * CAM_MOVE_SPEED);
+			Vector2f rot = Cubulus.getGameWindow().getInput().getMouseHandler().getDisplayVector();
+			renderer.getCamera().rotate(rot.x * CAM_ROT_SPEED, rot.y * CAM_ROT_SPEED, 0);
 		}
-		processInput(Cubulus.getGameWindow(), Cubulus.getGameWindow().getInput().getMouseHandler(), Cubulus.getGameWindow().getInput().getKeyboardHandler());
-		renderer.getCamera().move(cameraInc.x * CAM_MOVE_SPEED, cameraInc.y * CAM_MOVE_SPEED, cameraInc.z * CAM_MOVE_SPEED);
-		Vector2f rot = Cubulus.getGameWindow().getInput().getMouseHandler().getDisplayVector();
-		renderer.getCamera().rotate(rot.x * CAM_ROT_SPEED, rot.y * CAM_ROT_SPEED, 0);
 	}
 	
 	public void processInput(Window window, MouseHandler mouse, KeyboardHandler keyboard) {
