@@ -13,9 +13,10 @@ public class Mesh {
 	private final int vao;
 	private final int vbo;
 	private final int idxVbo;
+	private final int colorVbo;
 	private final int vertCount;
 	
-	public Mesh(float[] verts, int[] inds) {
+	public Mesh(float[] verts, float[] color, int[] inds) {
 		FloatBuffer vertBuffer = MemoryUtil.memAllocFloat(verts.length);
 		vertCount = inds.length;
 		vertBuffer.put(verts).flip();
@@ -34,11 +35,21 @@ public class Mesh {
 		indBuffer.put(inds).flip();
 		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, idxVbo);
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indBuffer, GL15.GL_STATIC_DRAW);
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		
+		colorVbo = GL15.glGenBuffers();
+		FloatBuffer colorBuffer = MemoryUtil.memAllocFloat(color.length);
+		colorBuffer.put(color).flip();
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, colorVbo);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorBuffer, GL15.GL_STATIC_DRAW);
+		GL20.glVertexAttribPointer(1, 3, GL11.GL_FLOAT, false, 0, 0);
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		
 		GL30.glBindVertexArray(0);
 		
 		MemoryUtil.memFree(vertBuffer);
 		MemoryUtil.memFree(indBuffer);
+		MemoryUtil.memFree(colorBuffer);
 	}
 	
 	public int getVaoId() {
@@ -59,6 +70,7 @@ public class Mesh {
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		GL15.glDeleteBuffers(vbo);
 		GL15.glDeleteBuffers(idxVbo);
+		GL15.glDeleteBuffers(colorVbo);
 		
 		GL30.glBindVertexArray(0);
 		GL30.glDeleteVertexArrays(vao);

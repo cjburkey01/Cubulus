@@ -21,10 +21,15 @@ public final class Renderer {
 			shaderBasic.link();
 			
 			testMesh = new Mesh(new float[] {
-					-0.5f, 0.5f, 0.0f,
-					-0.5f, -0.5f, 0.0f,
-					0.5f, -0.5f, 0.0f,
-					0.5f, 0.5f, 0.0f
+					-1.0f, 1.0f, 0.0f,
+					-1.0f, -1.0f, 0.0f,
+					1.0f, -1.0f, 0.0f,
+					1.0f, 1.0f, 0.0f
+			}, new float[] {
+					1.0f, 0.0f, 0.0f,
+					0.0f, 1.0f, 0.0f,
+					0.0f, 0.0f, 1.0f,
+					0.0f, 1.0f, 1.0f
 			}, new int[] {
 					0, 1, 3, 3, 1, 2
 			});
@@ -41,6 +46,7 @@ public final class Renderer {
 		shaderBasic.bind();
 		GL30.glBindVertexArray(mesh.getVaoId());
 		GL20.glEnableVertexAttribArray(0);
+		GL20.glEnableVertexAttribArray(1);
 		GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 		GL20.glDisableVertexAttribArray(0);
 		GL30.glBindVertexArray(0);

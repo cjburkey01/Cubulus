@@ -1,8 +1,5 @@
 package com.cjburkey.cubulus.logic;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 import org.lwjgl.glfw.GLFW;
 import com.cjburkey.cubulus.Cubulus;
 import com.cjburkey.cubulus.event.EventHandler;
@@ -15,10 +12,9 @@ public final class GameLogicCore implements IGameLogic {
 	
 	public void onGameInit() {
 		Cubulus.info("Initialized core game.");
-		asciiPrint();
+		//asciiPrint();
 		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_DOWN_EVENT, (data) -> onKeyDown(data.getLong("window"), data.getInt("key")));
 		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_UP_EVENT, (data) -> onKeyUp(data.getLong("window"), data.getInt("key")));
-		
 	}
 	
 	public void onRender() {
@@ -43,7 +39,7 @@ public final class GameLogicCore implements IGameLogic {
 		
 	}
 	
-	private void asciiPrint() {
+	/*private void asciiPrint() {
 		Cubulus.info("Printing some fun ascii text:");
 		String file = "/ascii.txt";
 		try {
@@ -59,6 +55,6 @@ public final class GameLogicCore implements IGameLogic {
 		} catch(Exception e) {
 			Cubulus.getInstance().error(-2, false, e);
 		}
-	}
+	}*/
 	
 }
