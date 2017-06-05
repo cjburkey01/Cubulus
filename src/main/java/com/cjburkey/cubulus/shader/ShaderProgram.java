@@ -56,7 +56,7 @@ public class ShaderProgram {
 		}
 	}
 	
-	private int createShader(String code, int type) {
+	protected int createShader(String code, int type) {
 		int id = GL20.glCreateShader(type);
 		if(id == 0) {
 			Cubulus.getInstance().error(-4, true, "Could not create shader.");

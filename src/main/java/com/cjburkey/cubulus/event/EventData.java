@@ -2,7 +2,7 @@ package com.cjburkey.cubulus.event;
 
 import java.util.HashMap;
 
-public class EventData {
+public final class EventData {
 	
 	private HashMap<String, Object> data;
 	

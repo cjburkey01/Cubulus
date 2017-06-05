@@ -7,7 +7,7 @@ import org.lwjgl.glfw.GLFW;
 import com.cjburkey.cubulus.Cubulus;
 import com.cjburkey.cubulus.event.EventHandler;
 
-public class GameLogicCore implements IGameLogic {
+public final class GameLogicCore implements IGameLogic {
 	
 	public void onUpdate() {
 		

@@ -10,7 +10,7 @@ import com.cjburkey.cubulus.Cubulus;
 import com.cjburkey.cubulus.Utils;
 import com.cjburkey.cubulus.shader.ShaderProgram;
 
-public class Renderer {
+public final class Renderer {
 	
 	private ShaderProgram shaderBasic;
 	private int vao;

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class EventHandler {
+public final class EventHandler {
 	
 	public static final String KEY_DOWN_EVENT = "KEY_DOWN_EVENT";	// Called when key is pressed.
 	public static final String KEY_UP_EVENT = "KEY_UP_EVENT";		// Called when key is released.

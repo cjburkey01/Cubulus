@@ -2,7 +2,7 @@ package com.cjburkey.cubulus;
 
 import java.util.Scanner;
 
-public class Utils {
+public final class Utils {
 	
 	public static String loadResource(String path) throws Exception {
 		StringBuilder out = new StringBuilder();
