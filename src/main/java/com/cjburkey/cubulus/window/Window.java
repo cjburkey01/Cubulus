@@ -41,6 +41,7 @@ public final class Window {
 		GLFW.glfwMakeContextCurrent(window);
 		GLFW.glfwSwapInterval((vsync) ? 1 : 0);
 		GLFW.glfwShowWindow(window);
+		GLFW.glfwSetCursorPos(window, width / 2, height / 2);
 	}
 	
 	public void setSize(boolean center, int width, int height) {

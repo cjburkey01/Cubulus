@@ -3,6 +3,9 @@ package com.cjburkey.cubulus.input;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
+import com.cjburkey.cubulus.Cubulus;
+import com.cjburkey.cubulus.GameStateHandler;
+import com.cjburkey.cubulus.window.Window;
 
 public class MouseHandler {
 	
@@ -14,45 +17,51 @@ public class MouseHandler {
 	private boolean rightPressed = false;
 	
 	public MouseHandler() {
-		prevPos = new Vector2d(-1.0d, -1.0d);
+		prevPos = new Vector2d();
 		pos = new Vector2d();
 		displVec = new Vector2f();
 	}
 	
-	public void init(long win) {
-		GLFW.glfwSetCursorPosCallback(win, (w, x, y) -> {
-			pos.x = x;
-			pos.y = y;
+	public void init(Window window) {
+		GameStateHandler.resetCursorPosition();
+		GLFW.glfwSetCursorPosCallback(window.getWindow(), (w, x, y) -> {
+			if(!GameStateHandler.isPaused()) {
+				pos.x = x;
+				pos.y = y;
+			}
 		});
 		
-		GLFW.glfwSetMouseButtonCallback(win, (w, button, action, mode) -> {
+		GLFW.glfwSetMouseButtonCallback(window.getWindow(), (w, button, action, mode) -> {
 			leftPressed = (button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS);
 			rightPressed = (button == GLFW.GLFW_MOUSE_BUTTON_2 && action == GLFW.GLFW_PRESS);
 			middlePressed = (button == GLFW.GLFW_MOUSE_BUTTON_3 && action == GLFW.GLFW_PRESS);
 		});
 	}
 	
-	// TODO: Lock cursor and get that working...
-	// TODO: There was something else, I'll remember it later, probably.
-	public void update() {
-		//DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
-		//DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
-		//Window window = Cubulus.getGameWindow();
-		
+	public void update(Window window) {
+		if(GameStateHandler.isPaused()) {
+			if(GLFW.glfwGetInputMode(window.getWindow(), GLFW.GLFW_CURSOR) != GLFW.GLFW_CURSOR_NORMAL) {
+				GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+				Cubulus.info("Enabling cursor.");
+			}
+		} else {
+			if(GLFW.glfwGetInputMode(window.getWindow(), GLFW.GLFW_CURSOR) != GLFW.GLFW_CURSOR_DISABLED) {
+				GLFW.glfwSetInputMode(window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+				Cubulus.info("Disabling cursor.");
+			}
+		}
 		
 		displVec.x = 0;
 		displVec.y = 0;
-		if(prevPos.x > 0 && prevPos.y > 0) {
-			double dX = pos.x - prevPos.x;
-			double dY = pos.y - prevPos.y;
-			boolean rotX = (dX != 0);
-			boolean rotY = (dY != 0);
-			if(rotX) {
-				displVec.y = (float) dX;
-			}
-			if(rotY) {
-				displVec.x = (float) dY;
-			}
+		double dX = pos.x - prevPos.x;
+		double dY = pos.y - prevPos.y;
+		boolean rotX = (dX != 0);
+		boolean rotY = (dY != 0);
+		if(rotX) {
+			displVec.y = (float) dX;
+		}
+		if(rotY) {
+			displVec.x = (float) dY;
 		}
 		prevPos.x = pos.x;
 		prevPos.y = pos.y;
@@ -60,6 +69,14 @@ public class MouseHandler {
 	
 	public Vector2f getDisplayVector() {
 		return displVec;
+	}
+	
+	public Vector2d getPosition() {
+		return pos;
+	}
+	
+	public Vector2d getPreviousPosition() {
+		return prevPos;
 	}
 	
 	public boolean isLeftPressed() {

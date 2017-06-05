@@ -2,10 +2,11 @@ package com.cjburkey.cubulus.logic;
 
 public interface IGameLogic {
 	
-	void onUpdate();
+	void onGameUpdate();
+	void onRenderUpdate();
 	void onGameInit();
-	void onRender();
 	void onRenderInit();
-	void onCleanup();
+	void onGameCleanup();
+	void onRenderCleanup();
 	
 }

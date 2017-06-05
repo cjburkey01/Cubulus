@@ -6,6 +6,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import com.cjburkey.cubulus.Cubulus;
+import com.cjburkey.cubulus.GameStateHandler;
 import com.cjburkey.cubulus.Utils;
 import com.cjburkey.cubulus.event.EventHandler;
 import com.cjburkey.cubulus.input.KeyboardHandler;
@@ -22,7 +23,7 @@ public final class GameLogicCore implements IGameLogic {
 	private List<GameItem> gameItems = new ArrayList<>();
 	private final Vector3f cameraInc = new Vector3f();
 	private final float CAM_MOVE_SPEED = 0.1f;
-	private final float CAM_ROT_SPEED = 0.5f;
+	private final float CAM_ROT_SPEED = 0.25f;
 	
 	public GameLogicCore() {
 		Mesh mesh = new MeshTestCube();
@@ -33,7 +34,7 @@ public final class GameLogicCore implements IGameLogic {
 		}
 	}
 	
-	public void onUpdate() {
+	public void onGameUpdate() {
 		if(renderer != null && renderer.getCamera() != null) {
 			for(GameItem item : gameItems) {
 				item.getRotation().y += 0.5f;
@@ -42,11 +43,13 @@ public final class GameLogicCore implements IGameLogic {
 			renderer.getCamera().move(cameraInc.x * CAM_MOVE_SPEED, cameraInc.y * CAM_MOVE_SPEED, cameraInc.z * CAM_MOVE_SPEED);
 			Vector2f rot = Cubulus.getGameWindow().getInput().getMouseHandler().getDisplayVector();
 			renderer.getCamera().rotate(rot.x * CAM_ROT_SPEED, rot.y * CAM_ROT_SPEED, 0);
+			renderer.getCamera().getRotation().x = Utils.clamp(renderer.getCamera().getRotation().x, -90, 90);
 		}
 	}
 	
 	public void processInput(Window window, MouseHandler mouse, KeyboardHandler keyboard) {
 		cameraInc.set(0.0f, 0.0f, 0.0f);
+		window.getInput().getMouseHandler().update(window);
 		if(keyboard.keyHeld(window, GLFW.GLFW_KEY_W)) {
 			cameraInc.z -= 1;
 		}
@@ -69,10 +72,12 @@ public final class GameLogicCore implements IGameLogic {
 	
 	public void onGameInit() {
 		Cubulus.info("Initialized core game.");
+		GameStateHandler.unPause();
 		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_DOWN_EVENT, (data) -> onKeyDown(data.getLong("window"), data.getInt("key")));
+		Cubulus.getGameWindow().getInput().getMouseHandler().init(Cubulus.getGameWindow());
 	}
 	
-	public void onRender() {
+	public void onRenderUpdate() {
 		renderer.render(gameItems.toArray(new GameItem[gameItems.size()]));
 	}
 	
@@ -81,17 +86,29 @@ public final class GameLogicCore implements IGameLogic {
 		renderer.init();
 	}
 	
-	public void onCleanup() {
-		Cubulus.info("Cleanup time.");
+	public void onRenderCleanup() {
 		for(GameItem item : gameItems) {
 			item.getMesh().cleanUp();
 		}
 		renderer.cleanup();
 	}
 	
+	public void onGameCleanup() {
+		gameItems.clear();
+	}
+	
 	public void onKeyDown(long window, int key) {
-		if(key == GLFW.GLFW_KEY_ESCAPE) {
+		if(key == GLFW.GLFW_KEY_KP_ENTER) {
 			Cubulus.getInstance().closeGame();
+			return;
+		}
+		if(key == GLFW.GLFW_KEY_ESCAPE) {
+			if(GameStateHandler.isPaused()) {
+				GameStateHandler.unPause();
+			} else {
+				GameStateHandler.pause();
+			}
+			return;
 		}
 	}
 	

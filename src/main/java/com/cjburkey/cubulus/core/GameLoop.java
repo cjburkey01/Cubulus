@@ -58,6 +58,7 @@ public final class GameLoop {
 					}
 				}
 			}
+			Cubulus.getCoreEventDispatcherForLogicEvents().gameCleanup();
 		}
 	}
 	
