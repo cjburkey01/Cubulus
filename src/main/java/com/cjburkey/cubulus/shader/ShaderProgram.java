@@ -37,7 +37,7 @@ public class ShaderProgram {
 		}
 		GL20.glValidateProgram(program);
 		if(GL20.glGetProgrami(program, GL20.GL_VALIDATE_STATUS) == 0) {
-			//Cubulus.getInstance().error(-7, true, "Could not validate program: " + GL20.glGetProgramInfoLog(program, 1024));
+			Cubulus.getInstance().error(-7, false, "Could not validate program: " + GL20.glGetProgramInfoLog(program, 1024));
 		}
 	}
 	

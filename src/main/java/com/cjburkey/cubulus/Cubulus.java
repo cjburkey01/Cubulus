@@ -87,6 +87,8 @@ public final class Cubulus {
 	private void finish() {
 		System.out.println("\n----------[ Begin Game ]----------\n");
 		startRenderLoop();
+		logger.info("Render loop closed.");
+		renderer.cleanup();
 		logicCleanup();
 		logger.info("Stopped.");
 		System.exit(0);
