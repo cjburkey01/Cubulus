@@ -1,6 +1,7 @@
 package com.cjburkey.cubulus.object;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
@@ -11,11 +12,12 @@ public class Mesh {
 	
 	private final int vao;
 	private final int vbo;
+	private final int idxVbo;
 	private final int vertCount;
 	
-	public Mesh(float[] verts) {
+	public Mesh(float[] verts, int[] inds) {
 		FloatBuffer vertBuffer = MemoryUtil.memAllocFloat(verts.length);
-		vertCount = verts.length / 3;
+		vertCount = inds.length;
 		vertBuffer.put(verts).flip();
 		
 		vao = GL30.glGenVertexArrays();
@@ -27,11 +29,16 @@ public class Mesh {
 		GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		
+		idxVbo = GL15.glGenBuffers();
+		IntBuffer indBuffer = MemoryUtil.memAllocInt(inds.length);
+		indBuffer.put(inds).flip();
+		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, idxVbo);
+		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indBuffer, GL15.GL_STATIC_DRAW);
+		
 		GL30.glBindVertexArray(0);
 		
-		if(vertBuffer != null) {
-			MemoryUtil.memFree(vertBuffer);
-		}
+		MemoryUtil.memFree(vertBuffer);
+		MemoryUtil.memFree(indBuffer);
 	}
 	
 	public int getVaoId() {
@@ -42,11 +49,16 @@ public class Mesh {
 		return vbo;
 	}
 	
+	public int getVertexCount() {
+		return vertCount;
+	}
+	
 	public void cleanUp() {
 		GL20.glDisableVertexAttribArray(0);
 		
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		GL15.glDeleteBuffers(vbo);
+		GL15.glDeleteBuffers(idxVbo);
 		
 		GL30.glBindVertexArray(0);
 		GL30.glDeleteVertexArrays(vao);
