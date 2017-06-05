@@ -12,7 +12,6 @@ import org.reflections.Reflections;
 import com.cjburkey.cubulus.core.GameLoop;
 import com.cjburkey.cubulus.event.EventHandler;
 import com.cjburkey.cubulus.logic.IGameLogic;
-import com.cjburkey.cubulus.render.Renderer;
 import com.cjburkey.cubulus.window.Window;
 
 public final class Cubulus {
@@ -21,7 +20,6 @@ public final class Cubulus {
 	private static Cubulus instance;
 	private Logger logger;
 	private Window window;
-	private Renderer renderer;
 	private GameLoop gameLoop;
 	private List<IGameLogic> logic;
 	private boolean rendering;
@@ -59,6 +57,10 @@ public final class Cubulus {
 		return logger;
 	}
 	
+	public Window getWindow() {
+		return window;
+	}
+	
 	public EventHandler getEventHandler() {
 		return eventHandler;
 	}
@@ -88,7 +90,6 @@ public final class Cubulus {
 		System.out.println("\n----------[ Begin Game ]----------\n");
 		startRenderLoop();
 		logger.info("Render loop closed.");
-		renderer.cleanup();
 		logicCleanup();
 		logger.info("Stopped.");
 		System.exit(0);
@@ -179,8 +180,6 @@ public final class Cubulus {
 		window = new Window(300, 300, "Cubulus v" + Info.getGameVersion(), true);
 		window.setSize(true, window.getMonitorWidth() * 2 / 3, window.getMonitorHeight() * 2 / 3);
 		GL.createCapabilities();
-		renderer = new Renderer();
-		renderer.init();
 	}
 	
 	private void startRenderLoop() {
@@ -200,8 +199,6 @@ public final class Cubulus {
 			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
 			setBuiltWindowTitle();
 		}
-		renderer.clear();
-		renderer.render();
 		logicRender();
 		GLFW.glfwSwapBuffers(window.getWindow());
 		GLFW.glfwPollEvents();
@@ -213,6 +210,10 @@ public final class Cubulus {
 	
 	public static Cubulus getInstance() {
 		return instance;
+	}
+	
+	public static Window getGameWindow() {
+		return instance.window;
 	}
 	
 	public static void info(Object msg) {

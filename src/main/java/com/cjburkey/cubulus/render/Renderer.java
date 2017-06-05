@@ -1,59 +1,51 @@
 package com.cjburkey.cubulus.render;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 import com.cjburkey.cubulus.Cubulus;
 import com.cjburkey.cubulus.Utils;
-import com.cjburkey.cubulus.object.Mesh;
+import com.cjburkey.cubulus.object.GameItem;
+import com.cjburkey.cubulus.object.Transformation;
 import com.cjburkey.cubulus.shader.ShaderProgram;
 
 public final class Renderer {
 	
+	private static final float FOV = (float) Math.toRadians(60.0f);
+	private static final float Z_NEAR = 0.01f;
+	private static final float Z_FAR = 1000.f;
+	
 	private ShaderProgram shaderBasic;
-	private Mesh testMesh;
+	private Transformation transform;
 	
 	public void init() {
+		transform = new Transformation();
+		
 		try {
 			shaderBasic = new ShaderProgram();
 			shaderBasic.createVertex(Utils.loadResource("/shader/basic/basic.vs"));
 			shaderBasic.createFragment(Utils.loadResource("/shader/basic/basic.fs"));
 			shaderBasic.link();
-			
-			testMesh = new Mesh(new float[] {
-					-1.0f, 1.0f, 0.0f,
-					-1.0f, -1.0f, 0.0f,
-					1.0f, -1.0f, 0.0f,
-					1.0f, 1.0f, 0.0f
-			}, new float[] {
-					1.0f, 0.0f, 0.0f,
-					0.0f, 1.0f, 0.0f,
-					0.0f, 0.0f, 1.0f,
-					0.0f, 1.0f, 1.0f
-			}, new int[] {
-					0, 1, 3, 3, 1, 2
-			});
+			shaderBasic.createUniform("projectionMatrix");
+			shaderBasic.createUniform("worldMatrix");
 		} catch(Exception e) {
 			Cubulus.getInstance().error(-182, true, "Could not load shader.");
 		}
 	}
 	
-	public void render() {
-		render(testMesh);
-	}
-	
-	public void render(Mesh mesh) {
+	public void render(GameItem[] gameItems) {
+		clear();
 		shaderBasic.bind();
-		GL30.glBindVertexArray(mesh.getVaoId());
-		GL20.glEnableVertexAttribArray(0);
-		GL20.glEnableVertexAttribArray(1);
-		GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
-		GL20.glDisableVertexAttribArray(0);
-		GL30.glBindVertexArray(0);
+		Matrix4f projection = transform.getProjectionMatrix(FOV, Cubulus.getGameWindow().getWidth(), Cubulus.getGameWindow().getHeight(), Z_NEAR, Z_FAR);
+		shaderBasic.setUniform("projectionMatrix", projection);
+		for(GameItem item : gameItems) {
+			Matrix4f world = transform.getWorldMatrix(item.getPosition(), item.getRotation(), item.getScale());
+			shaderBasic.setUniform("worldMatrix", world);
+			item.getMesh().render();
+		}
 		shaderBasic.unbind();
 	}
 	
-	public void clear() {
+	private void clear() {
 		GL11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 	}
@@ -63,7 +55,6 @@ public final class Renderer {
 		if(shaderBasic != null) {
 			shaderBasic.cleanup();
 		}
-		testMesh.cleanUp();
 		Cubulus.info("Cleaned up.");
 	}
 	

@@ -64,6 +64,16 @@ public class Mesh {
 		return vertCount;
 	}
 	
+	public void render() {
+		GL30.glBindVertexArray(getVaoId());
+		GL20.glEnableVertexAttribArray(0);
+		GL20.glEnableVertexAttribArray(1);
+		GL11.glDrawElements(GL11.GL_TRIANGLES, getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+		GL20.glDisableVertexAttribArray(0);
+		GL20.glDisableVertexAttribArray(1);
+		GL30.glBindVertexArray(0);
+	}
+	
 	public void cleanUp() {
 		GL20.glDisableVertexAttribArray(0);
 		

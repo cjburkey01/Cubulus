@@ -1,15 +1,21 @@
 package com.cjburkey.cubulus.shader;
 
+import java.nio.FloatBuffer;
+import java.util.HashMap;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.system.MemoryStack;
 import com.cjburkey.cubulus.Cubulus;
 
 public class ShaderProgram {
 	
+	private final HashMap<String, Integer> uniforms;
 	private final int program;
 	private int vertexShader;
 	private int fragmentShader;
 	
 	public ShaderProgram() {
+		uniforms = new HashMap<>();
 		program = GL20.glCreateProgram();
 		if(program == 0) {
 			Cubulus.getInstance().error(-3, true, "Could not create shader program.");
@@ -38,6 +44,23 @@ public class ShaderProgram {
 		GL20.glValidateProgram(program);
 		if(GL20.glGetProgrami(program, GL20.GL_VALIDATE_STATUS) == 0) {
 			Cubulus.getInstance().error(-7, false, "Could not validate program: " + GL20.glGetProgramInfoLog(program, 1024));
+			return;
+		}
+	}
+	
+	public void createUniform(String name) {
+		int loc = GL20.glGetUniformLocation(program, name);
+		if(loc < 0) {
+			Cubulus.getInstance().error(-8, true, "Could not create uniform: " + name);
+		}
+		uniforms.put(name, loc);
+	}
+	
+	public void setUniform(String name, Matrix4f value) {
+		try(MemoryStack stack = MemoryStack.stackPush()) {
+			FloatBuffer fb = stack.mallocFloat(16);
+			value.get(fb);
+			GL20.glUniformMatrix4fv(uniforms.get(name), false, fb);
 		}
 	}
 	
