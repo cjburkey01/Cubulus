@@ -26,12 +26,24 @@ public final class GameLogicCore implements IGameLogic {
 	private final float CAM_ROT_SPEED = 0.25f;
 	
 	public GameLogicCore() {
-		Mesh mesh = new MeshTestCube();
-		for(int i = 0; i < 10; i ++) {
-			GameItem item = new GameItem(mesh);
-			item.setPosition(Utils.randomRangef(-10.0f, 10.0f, true), 0.0f, Utils.randomRangef(-10.0f, 10.0f, true));
-			gameItems.add(item);
+		spawnMeshes(true);
+	}
+	
+	private void spawnMeshes(boolean clear) {
+		if(clear) {
+			gameItems.clear();
 		}
+		Mesh textured = new MeshTestCube("/texture/stone.png");
+		Mesh colored = new MeshTestCube(new Vector3f(0.5f, 0.6f, 0.7f));
+		for(int i = 0; i < 10; i ++) {
+			spawnMeshInstance((Utils.randomRangei(0, 1, true) == 1) ? textured : colored);
+		}
+	}
+	
+	private void spawnMeshInstance(Mesh mesh) {
+		GameItem item = new GameItem(mesh);
+		item.setPosition(Utils.randomRangef(-10.0f, 10.0f, true), 0.0f, Utils.randomRangef(-10.0f, 10.0f, true));
+		gameItems.add(item);
 	}
 	
 	public void onGameUpdate() {
@@ -100,6 +112,14 @@ public final class GameLogicCore implements IGameLogic {
 	public void onKeyDown(long window, int key) {
 		if(key == GLFW.GLFW_KEY_KP_ENTER) {
 			Cubulus.getInstance().closeGame();
+			return;
+		}
+		if(key == GLFW.GLFW_KEY_R) {
+			spawnMeshes(true);
+			return;
+		}
+		if(key == GLFW.GLFW_KEY_F) {
+			spawnMeshes(false);
 			return;
 		}
 		if(key == GLFW.GLFW_KEY_ESCAPE) {

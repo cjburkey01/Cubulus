@@ -1,5 +1,7 @@
 package com.cjburkey.cubulus;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -9,11 +11,20 @@ public final class Utils {
 		StringBuilder out = new StringBuilder();
 		Scanner scanner = new Scanner(Utils.class.getResourceAsStream(path));
 		while(scanner.hasNextLine()) {
-			out.append(scanner.nextLine());
-			out.append('\n');
+			out.append(scanner.nextLine() + '\n');
 		}
 		scanner.close();
 		return out.toString();
+	}
+	
+	public static List<String> loadResourceLines(String path) throws Exception {
+		List<String> out = new ArrayList<>();
+		Scanner scanner = new Scanner(Utils.class.getResourceAsStream(path));
+		while(scanner.hasNextLine()) {
+			out.add(scanner.nextLine() + '\n');
+		}
+		scanner.close();
+		return out;
 	}
 	
 	public static int randomRangei(int min, int max, boolean inclusive) {

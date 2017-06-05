@@ -30,6 +30,8 @@ public final class Renderer {
 			shaderBasic.createUniform("projectionMatrix");
 			shaderBasic.createUniform("modelViewMatrix");
 			shaderBasic.createUniform("texture_sampler");
+			shaderBasic.createUniform("color");
+			shaderBasic.createUniform("useColor");
 		} catch(Exception e) {
 			Cubulus.getInstance().error(-182, true, "Could not load shader.");
 		}
@@ -45,6 +47,8 @@ public final class Renderer {
 		for(GameItem item : gameItems) {
 			Matrix4f modelViewMatrix = transform.getModelViewMatrix(item, viewMatrix);
 			shaderBasic.setUniform("modelViewMatrix", modelViewMatrix);
+			shaderBasic.setUniform("color", item.getMesh().getColor());
+			shaderBasic.setUniform("useColor", (item.getMesh().useColor()) ? 1 : 0);
 			item.getMesh().render();
 		}
 		shaderBasic.unbind();

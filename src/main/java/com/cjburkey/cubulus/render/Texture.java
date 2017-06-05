@@ -17,7 +17,7 @@ public class Texture {
 			decoder = new PNGDecoder(Texture.class.getResourceAsStream(path));
 			sendToGpu();
 		} catch (Exception e) {
-			error(e);
+			error(path, e);
 		}
 	}
 	
@@ -38,8 +38,8 @@ public class Texture {
 		return texture;
 	}
 	
-	private static void error(Exception e) {
-		Cubulus.getInstance().error(-100, true, "Could not load image.");
+	private static void error(String image, Exception e) {
+		Cubulus.getInstance().error(-100, true, "Could not load image: " + image);
 	}
 	
 }

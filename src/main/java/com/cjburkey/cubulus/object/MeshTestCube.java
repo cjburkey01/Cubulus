@@ -1,9 +1,10 @@
 package com.cjburkey.cubulus.object;
 
+import org.joml.Vector3f;
 import com.cjburkey.cubulus.render.Texture;
 
 public final class MeshTestCube extends Mesh {
-	
+
 	private static final float[] verts = new float[] {
 			-0.5f, 0.5f, 0.5f,
 			-0.5f, -0.5f, 0.5f,
@@ -25,6 +26,10 @@ public final class MeshTestCube extends Mesh {
 			0.5f, -0.5f, -0.5f,
 			-0.5f, -0.5f, 0.5f,
 			0.5f, -0.5f, 0.5f,
+	};
+	
+	private static final float[] normals = new float[] {
+			
 	};
 
 	private static final float[] uvs = new float[] {
@@ -58,9 +63,13 @@ public final class MeshTestCube extends Mesh {
 			16, 18, 19, 17, 16, 19,
 			4, 6, 7, 5, 4, 7
 	};
-
-	public MeshTestCube() {
-		super(verts, uvs, inds, new Texture("/texture/basic/stone.png"));
+	
+	public MeshTestCube(String texture) {
+		super(verts, normals, uvs, inds, new Texture(texture));
+	}
+	
+	public MeshTestCube(Vector3f color) {
+		super(verts, normals, uvs, inds, color);
 	}
 	
 }

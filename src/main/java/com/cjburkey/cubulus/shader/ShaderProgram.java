@@ -3,6 +3,7 @@ package com.cjburkey.cubulus.shader;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryStack;
 import com.cjburkey.cubulus.Cubulus;
@@ -68,6 +69,10 @@ public class ShaderProgram {
 		GL20.glUniform1i(uniforms.get(name), value);
 	}
 	
+	public void setUniform(String name, Vector3f value) {
+		GL20.glUniform3f(uniforms.get(name), value.x, value.y, value.z);
+	}
+	
 	public void bind() {
 		GL20.glUseProgram(program);
 	}
@@ -91,7 +96,7 @@ public class ShaderProgram {
 		GL20.glShaderSource(id, code);
 		GL20.glCompileShader(id);
 		if(GL20.glGetShaderi(id, GL20.GL_COMPILE_STATUS) == 0) {
-			Cubulus.getInstance().error(-5, true, "Could not compile shader: " + GL20.glGetShaderInfoLog(id, 1024));
+			Cubulus.getInstance().error(-5, true, "Could not compile shader: " + GL20.glGetShaderInfoLog(id, 1024) + "\n" + code);
 		}
 		GL20.glAttachShader(program, id);
 		return id;
