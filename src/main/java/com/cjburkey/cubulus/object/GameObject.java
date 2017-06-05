@@ -2,14 +2,14 @@ package com.cjburkey.cubulus.object;
 
 import org.joml.Vector3f;
 
-public class GameItem {
+public class GameObject {
 	
 	private final Mesh mesh;
 	private final Vector3f position;
 	private float scale;
 	private final Vector3f rotation;
 	
-	public GameItem(Mesh mesh) {
+	public GameObject(Mesh mesh) {
 		this.mesh = mesh;
 		position = new Vector3f(0.0f, 0.0f, 0.0f);
 		scale = 1;

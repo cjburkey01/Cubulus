@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import com.cjburkey.cubulus.Cubulus;
 import com.cjburkey.cubulus.Utils;
-import com.cjburkey.cubulus.object.GameItem;
+import com.cjburkey.cubulus.object.GameObject;
 import com.cjburkey.cubulus.object.Transformation;
 import com.cjburkey.cubulus.shader.ShaderProgram;
 
@@ -37,14 +37,14 @@ public final class Renderer {
 		}
 	}
 	
-	public void render(GameItem[] gameItems) {
+	public void render(GameObject[] gameItems) {
 		clear();
 		shaderBasic.bind();
 		Matrix4f projectionMatrix = transform.getProjectionMatrix(FOV, Cubulus.getGameWindow().getWidth(), Cubulus.getGameWindow().getHeight(), Z_NEAR, Z_FAR);
 		Matrix4f viewMatrix = transform.getViewMatrix(camera);
 		shaderBasic.setUniform("projectionMatrix", projectionMatrix);
 		shaderBasic.setUniform("texture_sampler", 0);
-		for(GameItem item : gameItems) {
+		for(GameObject item : gameItems) {
 			Matrix4f modelViewMatrix = transform.getModelViewMatrix(item, viewMatrix);
 			shaderBasic.setUniform("modelViewMatrix", modelViewMatrix);
 			shaderBasic.setUniform("color", item.getMesh().getColor());

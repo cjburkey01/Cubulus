@@ -23,7 +23,7 @@ public final class Transformation {
 		return retProjectionMatrix;
 	}
 	
-	public Matrix4f getModelViewMatrix(GameItem gameItem, Matrix4f viewMatrix) {
+	public Matrix4f getModelViewMatrix(GameObject gameItem, Matrix4f viewMatrix) {
 		Vector3f rot = gameItem.getRotation();
 		
 		retModelViewMatrix.identity();

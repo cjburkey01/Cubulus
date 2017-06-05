@@ -11,7 +11,7 @@ import com.cjburkey.cubulus.Utils;
 import com.cjburkey.cubulus.event.EventHandler;
 import com.cjburkey.cubulus.input.KeyboardHandler;
 import com.cjburkey.cubulus.input.MouseHandler;
-import com.cjburkey.cubulus.object.GameItem;
+import com.cjburkey.cubulus.object.GameObject;
 import com.cjburkey.cubulus.object.Mesh;
 import com.cjburkey.cubulus.object.MeshTestCube;
 import com.cjburkey.cubulus.render.Renderer;
@@ -20,7 +20,7 @@ import com.cjburkey.cubulus.window.Window;
 public final class GameLogicCore implements IGameLogic {
 	
 	private Renderer renderer;
-	private List<GameItem> gameItems = new ArrayList<>();
+	private List<GameObject> gameItems = new ArrayList<>();
 	private final Vector3f cameraInc = new Vector3f();
 	private final float CAM_MOVE_SPEED = 0.1f;
 	private final float CAM_ROT_SPEED = 0.25f;
@@ -41,14 +41,14 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	private void spawnMeshInstance(Mesh mesh) {
-		GameItem item = new GameItem(mesh);
+		GameObject item = new GameObject(mesh);
 		item.setPosition(Utils.randomRangef(-10.0f, 10.0f, true), 0.0f, Utils.randomRangef(-10.0f, 10.0f, true));
 		gameItems.add(item);
 	}
 	
 	public void onGameUpdate() {
 		if(renderer != null && renderer.getCamera() != null) {
-			for(GameItem item : gameItems) {
+			for(GameObject item : gameItems) {
 				item.getRotation().y += 0.5f;
 			}
 			processInput(Cubulus.getGameWindow(), Cubulus.getGameWindow().getInput().getMouseHandler(), Cubulus.getGameWindow().getInput().getKeyboardHandler());
@@ -90,7 +90,7 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void onRenderUpdate() {
-		renderer.render(gameItems.toArray(new GameItem[gameItems.size()]));
+		renderer.render(gameItems.toArray(new GameObject[gameItems.size()]));
 	}
 	
 	public void onRenderInit() {
@@ -99,7 +99,7 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void onRenderCleanup() {
-		for(GameItem item : gameItems) {
+		for(GameObject item : gameItems) {
 			item.getMesh().cleanUp();
 		}
 		renderer.cleanup();
