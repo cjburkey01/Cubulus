@@ -6,13 +6,14 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 import com.cjburkey.cubulus.Cubulus;
-import com.cjburkey.cubulus.input.KeyboardHandler;
+import com.cjburkey.cubulus.input.InputHandler;
 
 public final class Window {
 	
 	private long window;
 	private boolean resized;
 	private int width, height;
+	private InputHandler input;
 	
 	public Window(int width, int height, String title, boolean vsync) {
 		GLFWErrorCallback.createPrint(System.err).set();
@@ -34,7 +35,8 @@ public final class Window {
 		}
 		setSize(true, width, height);
 		
-		GLFW.glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> KeyboardHandler.keyChanged(window, key, action));
+		input = new InputHandler();
+		GLFW.glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> input.getKeyboardHandler().keyChanged(window, key, action));
 		GLFW.glfwSetFramebufferSizeCallback(window, (window, w, h) -> setSize(false, w, h));
 		GLFW.glfwMakeContextCurrent(window);
 		GLFW.glfwSwapInterval((vsync) ? 1 : 0);
@@ -87,6 +89,10 @@ public final class Window {
 	public int getMonitorHeight() {
 		GLFWVidMode vidmode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
 		return vidmode.height();
+	}
+	
+	public InputHandler getInput() {
+		return input;
 	}
 	
 }

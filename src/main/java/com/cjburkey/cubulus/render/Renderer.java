@@ -63,4 +63,8 @@ public final class Renderer {
 		Cubulus.info("Cleaned up.");
 	}
 	
+	public Camera getCamera() {
+		return camera;
+	}
+	
 }

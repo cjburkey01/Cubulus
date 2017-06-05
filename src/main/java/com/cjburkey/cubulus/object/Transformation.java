@@ -6,47 +6,48 @@ import com.cjburkey.cubulus.render.Camera;
 
 public final class Transformation {
 	
-	private final Matrix4f projectionMatrix;
-	private final Matrix4f modelViewMatrix;
-	private final Matrix4f viewMatrix;
+	private final Matrix4f retProjectionMatrix;
+	private final Matrix4f retModelViewMatrix;
+	private final Matrix4f retViewMatrix;
 	
 	public Transformation() {
-		projectionMatrix = new Matrix4f();
-		modelViewMatrix = new Matrix4f();
-		viewMatrix = new Matrix4f();
+		retProjectionMatrix = new Matrix4f();
+		retModelViewMatrix = new Matrix4f();
+		retViewMatrix = new Matrix4f();
 	}
 	
 	public Matrix4f getProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
 		float aspect = width / height;
-		projectionMatrix.identity();
-		projectionMatrix.perspective(fov, aspect, zNear, zFar);
-		return projectionMatrix;
+		retProjectionMatrix.identity();
+		retProjectionMatrix.perspective(fov, aspect, zNear, zFar);
+		return retProjectionMatrix;
 	}
 	
 	public Matrix4f getModelViewMatrix(GameItem gameItem, Matrix4f viewMatrix) {
 		Vector3f rot = gameItem.getRotation();
 		
-		modelViewMatrix.identity();
-		modelViewMatrix.translate(gameItem.getPosition());
-		modelViewMatrix.rotateX((float) Math.toRadians(-rot.x));
-		modelViewMatrix.rotateY((float) Math.toRadians(-rot.y));
-		modelViewMatrix.rotateZ((float) Math.toRadians(-rot.z));
-		modelViewMatrix.scale(gameItem.getScale());
+		retModelViewMatrix.identity();
+		retModelViewMatrix.translate(gameItem.getPosition());
+		retModelViewMatrix.rotateX((float) Math.toRadians(-rot.x));
+		retModelViewMatrix.rotateY((float) Math.toRadians(-rot.y));
+		retModelViewMatrix.rotateZ((float) Math.toRadians(-rot.z));
+		retModelViewMatrix.scale(gameItem.getScale());
 		
-		return viewMatrix.mul(modelViewMatrix);
+		Matrix4f viewCurr = new Matrix4f(viewMatrix);
+		return viewCurr.mul(retModelViewMatrix);
 	}
 	
 	public Matrix4f getViewMatrix(Camera camera) {
 		Vector3f camPos = camera.getPosition();
 		Vector3f camRot = camera.getRotation();
 		
-		viewMatrix.identity();
-		viewMatrix.rotate((float) Math.toRadians(camRot.x), new Vector3f(1, 0, 0));
-		viewMatrix.rotate((float) Math.toRadians(camRot.y), new Vector3f(0, 1, 0));
-		viewMatrix.rotate((float) Math.toRadians(camRot.z), new Vector3f(0, 0, 1));
-		viewMatrix.translate(-camPos.x, -camPos.y, -camPos.z);
+		retViewMatrix.identity();
+		retViewMatrix.rotate((float) Math.toRadians(camRot.x), new Vector3f(1, 0, 0));
+		retViewMatrix.rotate((float) Math.toRadians(camRot.y), new Vector3f(0, 1, 0));
+		retViewMatrix.rotate((float) Math.toRadians(camRot.z), new Vector3f(0, 0, 1));
+		retViewMatrix.translate(-camPos.x, -camPos.y, -camPos.z);
 		
-		return viewMatrix;
+		return retViewMatrix;
 	}
 	
 }

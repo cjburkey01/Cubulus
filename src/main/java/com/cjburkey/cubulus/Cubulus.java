@@ -123,6 +123,7 @@ public final class Cubulus {
 	}
 	
 	private void logicGameInit() {
+		window.getInput().getMouseHandler().init(window.getWindow());
 		for(IGameLogic l : logic) {
 			l.onGameInit();
 		}
@@ -140,6 +141,7 @@ public final class Cubulus {
 			firstUpdate = false;
 			logicGameInit();
 		}
+		window.getInput().getMouseHandler().update(window.getWindow());
 		for(IGameLogic l : logic) {
 			l.onUpdate();
 		}

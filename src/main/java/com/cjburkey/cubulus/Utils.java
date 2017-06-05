@@ -1,6 +1,7 @@
 package com.cjburkey.cubulus;
 
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class Utils {
 	
@@ -13,6 +14,14 @@ public final class Utils {
 		}
 		scanner.close();
 		return out.toString();
+	}
+	
+	public static int randomRangei(int min, int max, boolean inclusive) {
+		return ThreadLocalRandom.current().nextInt(min, max + ((inclusive) ? 1 : 0));
+	}
+	
+	public static float randomRangef(float min, float max, boolean inclusive) {
+		return (ThreadLocalRandom.current().nextFloat() * (max + ((inclusive) ? 1 : 0) - min)) + min;
 	}
 	
 }

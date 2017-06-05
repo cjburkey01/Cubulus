@@ -8,11 +8,11 @@ import com.cjburkey.cubulus.window.Window;
 
 public final class KeyboardHandler {
 	
-	public static boolean keyHeld(Window window, int key) {
+	public boolean keyHeld(Window window, int key) {
 		return GLFW.glfwGetKey(window.getWindow(), key) == GLFW.GLFW_PRESS;
 	}
 	
-	public static void keyChanged(long window, int key, int action) {
+	public void keyChanged(long window, int key, int action) {
 		EventData data = new EventData();
 		data.set("window", window);
 		data.set("key", key);
