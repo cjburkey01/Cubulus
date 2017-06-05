@@ -16,9 +16,11 @@ public final class Renderer {
 	
 	private ShaderProgram shaderBasic;
 	private Transformation transform;
+	private Camera camera;
 	
 	public void init() {
 		transform = new Transformation();
+		camera = new Camera();
 		
 		try {
 			shaderBasic = new ShaderProgram();
@@ -26,7 +28,7 @@ public final class Renderer {
 			shaderBasic.createFragment(Utils.loadResource("/shader/basic/basic.fs"));
 			shaderBasic.link();
 			shaderBasic.createUniform("projectionMatrix");
-			shaderBasic.createUniform("worldMatrix");
+			shaderBasic.createUniform("modelViewMatrix");
 			shaderBasic.createUniform("texture_sampler");
 		} catch(Exception e) {
 			Cubulus.getInstance().error(-182, true, "Could not load shader.");
@@ -36,12 +38,13 @@ public final class Renderer {
 	public void render(GameItem[] gameItems) {
 		clear();
 		shaderBasic.bind();
-		Matrix4f projection = transform.getProjectionMatrix(FOV, Cubulus.getGameWindow().getWidth(), Cubulus.getGameWindow().getHeight(), Z_NEAR, Z_FAR);
-		shaderBasic.setUniform("projectionMatrix", projection);
+		Matrix4f projectionMatrix = transform.getProjectionMatrix(FOV, Cubulus.getGameWindow().getWidth(), Cubulus.getGameWindow().getHeight(), Z_NEAR, Z_FAR);
+		Matrix4f viewMatrix = transform.getViewMatrix(camera);
+		shaderBasic.setUniform("projectionMatrix", projectionMatrix);
 		shaderBasic.setUniform("texture_sampler", 0);
 		for(GameItem item : gameItems) {
-			Matrix4f world = transform.getWorldMatrix(item.getPosition(), item.getRotation(), item.getScale());
-			shaderBasic.setUniform("worldMatrix", world);
+			Matrix4f modelViewMatrix = transform.getModelViewMatrix(item, viewMatrix);
+			shaderBasic.setUniform("modelViewMatrix", modelViewMatrix);
 			item.getMesh().render();
 		}
 		shaderBasic.unbind();
