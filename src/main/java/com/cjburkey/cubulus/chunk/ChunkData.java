@@ -20,6 +20,11 @@ public final class ChunkData {
 		return out.mul(chunkSize);
 	}
 	
+	public Vector3i getWorldCoordsi() {
+		Vector3i out = new Vector3i(pos);
+		return out.mul(chunkSize);
+	}
+	
 	public Vector3i getChunkCoords() {
 		return pos;
 	}

@@ -73,11 +73,7 @@ public final class MeshChunk {
 	}
 	
 	private static boolean transparentBlockAt(ChunkData data, int x, int y, int z) {
-		Block at = data.getBlock(x, y, z);
-		if(at != null) {
-			return at.isTransparent();
-		}
-		return true;
+		return GameLogicCore.getInstance().getWorld().transparentBlockAt(data, x, y, z);
 	}
 	
 	private static void addBlockFace(Block block, Vector3f corner, Vector3f up, Vector3f right, boolean rev, List<Vector3f> verts, List<Integer> tris, List<Vector2f> uvs) {

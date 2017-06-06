@@ -1,11 +1,14 @@
 package com.cjburkey.cubulus.world;
 
+import org.joml.Vector3f;
 import com.cjburkey.cubulus.Cubulus;
-import com.cjburkey.cubulus.Utils;
+import com.cjburkey.cubulus.block.Block;
 import com.cjburkey.cubulus.block.Blocks;
 import com.cjburkey.cubulus.chunk.ChunkData;
 
 public final class ChunkGeneration {
+	
+	private static final double scale = 0.025d;
 	
 	public static void generateChunk(ChunkData chunk) {
 		Cubulus.info("Generating chunk: " + chunk.getChunkCoords() + "...");
@@ -13,13 +16,19 @@ public final class ChunkGeneration {
 		for(int x = 0; x < size; x ++) {
 			for(int y = 0; y < size; y ++) {
 				for(int z = 0; z < size; z ++) {
-					if(Utils.randomRangei(0, 16, true) > y) {
-						chunk.setBlock(x, y, z, Blocks.blockStone);
-					}
+					Vector3f chunkPos = chunk.getWorldCoords();
+					Block block = getBlockAt(chunkPos.add(new Vector3f(x, y, z)));
+					chunk.setBlock(x, y, z, block);
 				}
 			}
 		}
 		Cubulus.info("  ...Done");
+	}
+	
+	private static Block getBlockAt(Vector3f pos) {
+		pos.mul((float) scale);
+		double noise = SimplexNoise.noise(pos.x, pos.y, pos.z);
+		return (noise >= 0.5d) ? Blocks.blockStone : null;
 	}
 	
 }

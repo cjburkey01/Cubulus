@@ -52,8 +52,7 @@ public final class GameLogicCore implements IGameLogic {
 			Vector2f rot = Cubulus.getGameWindow().getInput().getMouseHandler().getDisplayVector();
 			cam.rotate(rot.x * CAM_ROT_SPEED, rot.y * CAM_ROT_SPEED, 0);
 			cam.getRotation().x = Utils.clamp(cam.getRotation().x, -90, 90);
-			Thread t = new Thread(() -> world.ensureChunksAround(cam.getPosition(), 3));
-			t.start();
+			world.ensureChunksAround(cam.getPosition(), 3);
 		}
 	}
 	
@@ -110,6 +109,7 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void onRenderInit() {
+		GLFW.glfwFocusWindow(Cubulus.getGameWindow().getWindow());
 		renderer = new Renderer();
 		renderer.init();
 	}
