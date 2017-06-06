@@ -15,7 +15,7 @@ public final class ChunkData {
 		pos = new Vector3i(chunkX, chunkY, chunkZ);
 	}
 	
-	public Vector3f getWorldCoords() {
+	public Vector3f getWorldCoordsf() {
 		Vector3f out = new Vector3f(pos.x, pos.y, pos.z);
 		return out.mul(chunkSize);
 	}

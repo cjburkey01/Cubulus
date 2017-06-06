@@ -21,10 +21,22 @@ public final class Texture {
 	public Texture(String path, InputStream stream) {
 		try {
 			decoder = new PNGDecoder(stream);
-			sendToGpu();
+			Cubulus.getInstance().runLater(() -> {
+				try {
+					sendToGpu();
+				} catch (Exception e) { error(path, e); }
+			});
 		} catch (Exception e) {
 			error(path, e);
 		}
+	}
+	
+	public void cleanup() {
+		GL11.glDeleteTextures(texture);
+	}
+	
+	public int getTextureId() {
+		return texture;
 	}
 	
 	private void sendToGpu() throws Exception {
@@ -38,10 +50,6 @@ public final class Texture {
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
 		GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
-	}
-	
-	public int getTextureId() {
-		return texture;
 	}
 	
 	private static void error(String image, Exception e) {

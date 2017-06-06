@@ -8,7 +8,6 @@ import org.lwjgl.glfw.GLFW;
 import com.cjburkey.cubulus.Cubulus;
 import com.cjburkey.cubulus.Utils;
 import com.cjburkey.cubulus.block.Blocks;
-import com.cjburkey.cubulus.chunk.ChunkHandler;
 import com.cjburkey.cubulus.core.GameStateHandler;
 import com.cjburkey.cubulus.event.EventHandler;
 import com.cjburkey.cubulus.fun.AsciiMessage;
@@ -16,10 +15,14 @@ import com.cjburkey.cubulus.input.KeyboardHandler;
 import com.cjburkey.cubulus.input.MouseHandler;
 import com.cjburkey.cubulus.io.Dirs;
 import com.cjburkey.cubulus.io.TextureAtlas;
+import com.cjburkey.cubulus.light.DirectionalLight;
+import com.cjburkey.cubulus.light.PointLight;
+import com.cjburkey.cubulus.light.PointLight.Attenuation;
 import com.cjburkey.cubulus.object.GameObject;
 import com.cjburkey.cubulus.render.Camera;
 import com.cjburkey.cubulus.render.Renderer;
 import com.cjburkey.cubulus.window.Window;
+import com.cjburkey.cubulus.world.World;
 
 public final class GameLogicCore implements IGameLogic {
 	
@@ -27,20 +30,19 @@ public final class GameLogicCore implements IGameLogic {
 	private List<GameObject> gameObjects = new ArrayList<>();
 	
 	private TextureAtlas texture;
-	private ChunkHandler world;
+	private World world;
 	private Renderer renderer;
 	private final Vector3f cameraInc = new Vector3f();
 	private final float CAM_MOVE_SPEED = 0.1f;
 	private final float CAM_ROT_SPEED = 0.25f;
 	private boolean ascii = false;
 	
+	private Vector3f ambientLight;
+	private PointLight pointLight;
+	private DirectionalLight directionalLight;
+	
 	public GameLogicCore() {
 		instance = this;
-	}
-	
-	private void startGeneration() {
-		Cubulus.info("Starting generation system");
-		world = new ChunkHandler();
 	}
 	
 	public void onGameUpdate() {
@@ -51,7 +53,7 @@ public final class GameLogicCore implements IGameLogic {
 			Vector2f rot = Cubulus.getGameWindow().getInput().getMouseHandler().getDisplayVector();
 			cam.rotate(rot.x * CAM_ROT_SPEED, rot.y * CAM_ROT_SPEED, 0);
 			cam.getRotation().x = Utils.clamp(cam.getRotation().x, -90, 90);
-			world.ensureChunksAround(cam.getPosition(), 5);
+			world.loadChunksAround(cam.getPosition(), World.loadRadius);
 		}
 	}
 	
@@ -83,7 +85,11 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void removeGameObject(GameObject obj) {
-		Cubulus.getInstance().runLater(() -> obj.getMesh().cleanUp());
+		Cubulus.getInstance().runLater(() -> {
+			if(obj != null && obj.getMesh() != null) {
+				obj.getMesh().cleanUp();
+			}
+		});
 		gameObjects.remove(obj);
 	}
 	
@@ -93,22 +99,27 @@ public final class GameLogicCore implements IGameLogic {
 			if(ascii) ascii();
 			Dirs.init();
 			Blocks.initBlocks();
-			texture = new TextureAtlas();
+			(texture = new TextureAtlas(Blocks.getAllBlocks())).init();
+			
 			Cubulus.getGameWindow().getInput().getMouseHandler().resetCursorPosition();
 			Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_DOWN_EVENT, (data) -> onKeyDown(data.getLong("window"), data.getInt("key")));
 			Cubulus.getGameWindow().getInput().getMouseHandler().init(Cubulus.getGameWindow());
 			
-			startGeneration();
+			world = new World();
 		} catch(Exception e) {
 			Cubulus.getInstance().error(-200, true, e);
 		}
 	}
 	
 	public void onRenderUpdate() {
-		renderer.render(gameObjects.toArray(new GameObject[gameObjects.size()]));
+		renderer.render(gameObjects.toArray(new GameObject[gameObjects.size()]), ambientLight, pointLight, directionalLight);
 	}
 	
 	public void onRenderInit() {
+		ambientLight = new Vector3f(1f, 1f, 1f);
+		pointLight = new PointLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0, 0, 0), 100.0f, new Attenuation(1.0f, 0.0f, 0.0f));
+		directionalLight = new DirectionalLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(-1.0f, -1.0f, 0.0f), 100.0f);
+		
 		GLFW.glfwFocusWindow(Cubulus.getGameWindow().getWindow());
 		renderer = new Renderer();
 		renderer.init();
@@ -116,14 +127,16 @@ public final class GameLogicCore implements IGameLogic {
 	
 	public void onRenderCleanup() {
 		for(GameObject item : gameObjects) {
-			item.getMesh().cleanUp();
+			if(item != null && item.getMesh() != null) {
+				item.getMesh().cleanUp();
+			}
 		}
 		renderer.cleanup();
 	}
 	
 	public void onGameCleanup() {
-		world.stop();
 		gameObjects.clear();
+		texture.cleanup();
 		Dirs.cleanup();
 	}
 	
@@ -142,15 +155,15 @@ public final class GameLogicCore implements IGameLogic {
 		}
 	}
 	
+	public TextureAtlas getAtlas() {
+		return texture;
+	}
+	
 	private void ascii() {
 		new AsciiMessage();
 	}
 	
-	public TextureAtlas getTextureAtlas() {
-		return texture;
-	}
-	
-	public ChunkHandler getWorld() {
+	public World getWorld() {
 		return world;
 	}
 	

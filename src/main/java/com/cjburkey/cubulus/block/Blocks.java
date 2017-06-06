@@ -15,10 +15,16 @@ public final class Blocks {
 	}
 	
 	public static Block blockStone;
+	public static Block blockGrass;
+	public static Block blockDirt;
 	
 	public static void initBlocks() {
 		Cubulus.info("Initializing blocks...");
+		
 		blockStone = addBlock(new Block("block_stone", "cubulus:texture/block/block_stone.png", true));
+		blockGrass = addBlock(new Block("block_grass", "cubulus:texture/block/block_grass.png", true));
+		blockDirt = addBlock(new Block("block_dirt", "cubulus:texture/block/block_dirt.png", true));
+		
 		Cubulus.info("Initialized blocks.");
 	}
 	

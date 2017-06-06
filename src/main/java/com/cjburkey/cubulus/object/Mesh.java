@@ -2,47 +2,30 @@ package com.cjburkey.cubulus.object;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import org.joml.Vector3f;
+import java.util.ArrayList;
+import java.util.List;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
+import com.cjburkey.cubulus.light.Material;
 import com.cjburkey.cubulus.render.Texture;
 
-@SuppressWarnings("unused")
 public class Mesh {
 	
-	private int vao;
-	private int vbo;
-	private int idxVbo;
-	private int uvVbo;
-	private int vertCount;
-	private final Vector3f color;
-	private final Texture texture;
+	private int vaoId;
+	private List<Integer> vboIdList;
+	private int vertexCount;
+	private Material material;
 	
-	private float[] verts;
-	private float[] norms;
-	private float[] uvs;
-	private int[] tris;
+	private final float[] verts;
+	private final float[] norms;
+	private final float[] uvs;
+	private final int[] tris;
 	
-	public Mesh(float[] verts, float[] normals, float[] uvs, int[] inds, String texture) {
-		this(verts, normals, uvs, inds, new Texture(texture), new Vector3f());
-	}
-	
-	public Mesh(float[] verts, float[] normals, float[] uvs, int[] inds, Texture texture) {
-		this(verts, normals, uvs, inds, texture, new Vector3f());
-	}
-	
-	public Mesh(float[] verts, float[] normals, float[] uvs, int[] inds, Vector3f color) {
-		this(verts, normals, uvs, inds, null, color);
-	}
-	
-	private Mesh(float[] verts, float[] normals, float[] uvs, int[] inds, Texture texture, Vector3f color) {
-		this.texture = texture;
-		this.color = color;
-		
+	public Mesh(float[] verts, float[] normals, float[] uvs, int[] inds) {
 		this.verts = verts;
 		this.norms = normals;
 		this.uvs = uvs;
@@ -50,89 +33,117 @@ public class Mesh {
 	}
 	
 	public void build() {
-		FloatBuffer vertBuffer = MemoryUtil.memAllocFloat(verts.length);
-		vertCount = tris.length;
-		vertBuffer.put(verts).flip();
-		
-		vao = GL30.glGenVertexArrays();
-		GL30.glBindVertexArray(vao);
-		
-		vbo = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertBuffer, GL15.GL_STATIC_DRAW);
-		GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
-		uvVbo = GL15.glGenBuffers();
-		FloatBuffer colorBuffer = MemoryUtil.memAllocFloat(uvs.length);
-		colorBuffer.put(uvs).flip();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, uvVbo);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorBuffer, GL15.GL_STATIC_DRAW);
-		GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 0, 0);
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
-		idxVbo = GL15.glGenBuffers();
-		IntBuffer indBuffer = MemoryUtil.memAllocInt(tris.length);
-		indBuffer.put(tris).flip();
-		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, idxVbo);
-		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indBuffer, GL15.GL_STATIC_DRAW);
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
-		GL30.glBindVertexArray(0);
-		
-		MemoryUtil.memFree(vertBuffer);
-		MemoryUtil.memFree(indBuffer);
-		MemoryUtil.memFree(colorBuffer);
+		FloatBuffer posBuffer = null;
+		FloatBuffer textCoordsBuffer = null;
+		FloatBuffer vecNormalsBuffer = null;
+		IntBuffer indicesBuffer = null;
+		try {
+			vertexCount = tris.length;
+			vboIdList = new ArrayList<>();
+			vaoId = GL30.glGenVertexArrays();
+			GL30.glBindVertexArray(vaoId);
+			
+			int vboId = GL15.glGenBuffers();
+			vboIdList.add(vboId);
+			posBuffer = MemoryUtil.memAllocFloat(verts.length);
+			posBuffer.put(verts).flip();
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
+			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, posBuffer, GL15.GL_STATIC_DRAW);
+			GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
+			
+			vboId = GL15.glGenBuffers();
+			vboIdList.add(vboId);
+			textCoordsBuffer = MemoryUtil.memAllocFloat(uvs.length);
+			textCoordsBuffer.put(uvs).flip();
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
+			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, textCoordsBuffer, GL15.GL_STATIC_DRAW);
+			GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 0, 0);
+			
+			vboId = GL15.glGenBuffers();
+			vboIdList.add(vboId);
+			vecNormalsBuffer = MemoryUtil.memAllocFloat(norms.length);
+			vecNormalsBuffer.put(norms).flip();
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
+			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vecNormalsBuffer, GL15.GL_STATIC_DRAW);
+			GL20.glVertexAttribPointer(2, 3, GL11.GL_FLOAT, false, 0, 0);
+			
+			vboId = GL15.glGenBuffers();
+			vboIdList.add(vboId);
+			indicesBuffer = MemoryUtil.memAllocInt(tris.length);
+			indicesBuffer.put(tris).flip();
+			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId);
+			GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
+			
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+			GL30.glBindVertexArray(0);
+		} finally {
+			if(posBuffer != null) {
+				MemoryUtil.memFree(posBuffer);
+			}
+			if(textCoordsBuffer != null) {
+				MemoryUtil.memFree(textCoordsBuffer);
+			}
+			if(vecNormalsBuffer != null) {
+				MemoryUtil.memFree(vecNormalsBuffer);
+			}
+			if(indicesBuffer != null) {
+				MemoryUtil.memFree(indicesBuffer);
+			}
+		}
 	}
 	
-	public Texture getTexture() {
-		return texture;
+	public void setMaterial(Material material) {
+		this.material = material;
 	}
 	
-	public boolean useColor() {
-		return texture == null;
-	}
-	
-	public Vector3f getColor() {
-		return color;
+	public Material getMaterial() {
+		return material;
 	}
 	
 	public int getVaoId() {
-		return vao;
-	}
-	
-	public int getVboId() {
-		return vbo;
+		return vaoId;
 	}
 	
 	public int getVertexCount() {
-		return vertCount;
+		return vertexCount;
 	}
 	
 	public void render() {
+		Texture texture = material.getTexture();
 		if(texture != null) {
 			GL13.glActiveTexture(GL13.GL_TEXTURE0);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getTextureId());
 		}
+		
 		GL30.glBindVertexArray(getVaoId());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
+		//GL20.glEnableVertexAttribArray(2);
+		
 		GL11.glDrawElements(GL11.GL_TRIANGLES, getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+		
 		GL20.glDisableVertexAttribArray(0);
 		GL20.glDisableVertexAttribArray(1);
+		//GL20.glDisableVertexAttribArray(2);
 		GL30.glBindVertexArray(0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 	}
 	
 	public void cleanUp() {
 		GL20.glDisableVertexAttribArray(0);
 		
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		GL15.glDeleteBuffers(vbo);
-		GL15.glDeleteBuffers(idxVbo);
-		GL15.glDeleteBuffers(uvVbo);
+		for(int vboId : vboIdList) {
+			GL15.glDeleteBuffers(vboId);
+		}
+		
+		Texture texture = material.getTexture();
+		if(texture != null) {
+			texture.cleanup();
+		}
 		
 		GL30.glBindVertexArray(0);
-		GL30.glDeleteVertexArrays(vao);
+		GL30.glDeleteVertexArrays(vaoId);
 	}
 	
 }

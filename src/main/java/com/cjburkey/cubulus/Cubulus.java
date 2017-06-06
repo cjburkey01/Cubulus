@@ -183,14 +183,19 @@ public final class Cubulus {
 			window.cancelResize();
 			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
 		}
-		for(int i = 0; i < runLater.size(); i ++) {
-			runLater.get(i).run();
-		}
-		runLater.clear();
+		callNextRunLater();
 		setBuiltWindowTitle();
 		logicEvents.renderUpdate();
 		GLFW.glfwSwapBuffers(window.getWindow());
 		GLFW.glfwPollEvents();
+	}
+	
+	private void callNextRunLater() {
+		if(runLater.size() > 0) {
+			Runnable r = runLater.get(0);
+			runLater.remove(r);
+			r.run();
+		}
 	}
 	
 	private void setBuiltWindowTitle() {
