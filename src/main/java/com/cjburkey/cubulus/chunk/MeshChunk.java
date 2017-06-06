@@ -42,7 +42,6 @@ public final class MeshChunk {
 		float[] normsArr = floatFromVec3List(norms);
 		float[] uvsArr = floatFromVec2List(uvs);
 		int[] indicesArr = intFromIntList(indices);
-		
 		return new Mesh(vertsArr, normsArr, uvsArr, indicesArr, texture);
 	}
 	
@@ -110,7 +109,7 @@ public final class MeshChunk {
 			tris.add(index + 0);
 		}
 		
-		final TextureAtlas ta = GameLogicCore.getInstance().getTextureAtlas();;
+		final TextureAtlas ta = GameLogicCore.getInstance().getTextureAtlas();
 		uvs.add(new Vector2f(atlasStep * ta.getForBlock(block).x, atlasStep * ta.getForBlock(block).y));
 		uvs.add(new Vector2f(atlasStep * ta.getForBlock(block).x, atlasStep + atlasStep * ta.getForBlock(block).y));
 		uvs.add(new Vector2f(atlasStep + atlasStep * ta.getForBlock(block).x, atlasStep + atlasStep * ta.getForBlock(block).y));
@@ -146,6 +145,8 @@ public final class MeshChunk {
 		return out;
 	}
 	
+	// Old code for cube, don't use it anymore, it's really bad.
+	// I kept it here because I don't trust myself and might break the new code.
 	/*private static final float[] verts = new float[] {
 			0.0f, -chunkSize, chunkSize,
 			0.0f, 0.0f, chunkSize,

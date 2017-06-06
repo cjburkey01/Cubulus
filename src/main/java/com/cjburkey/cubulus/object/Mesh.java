@@ -11,15 +11,21 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
 import com.cjburkey.cubulus.render.Texture;
 
+@SuppressWarnings("unused")
 public class Mesh {
 	
-	private final int vao;
-	private final int vbo;
-	private final int idxVbo;
-	private final int uvVbo;
-	private final int vertCount;
+	private int vao;
+	private int vbo;
+	private int idxVbo;
+	private int uvVbo;
+	private int vertCount;
 	private final Vector3f color;
 	private final Texture texture;
+	
+	private float[] verts;
+	private float[] norms;
+	private float[] uvs;
+	private int[] tris;
 	
 	public Mesh(float[] verts, float[] normals, float[] uvs, int[] inds, String texture) {
 		this(verts, normals, uvs, inds, new Texture(texture), new Vector3f());
@@ -37,8 +43,15 @@ public class Mesh {
 		this.texture = texture;
 		this.color = color;
 		
+		this.verts = verts;
+		this.norms = normals;
+		this.uvs = uvs;
+		tris = inds;
+	}
+	
+	public void build() {
 		FloatBuffer vertBuffer = MemoryUtil.memAllocFloat(verts.length);
-		vertCount = inds.length;
+		vertCount = tris.length;
 		vertBuffer.put(verts).flip();
 		
 		vao = GL30.glGenVertexArrays();
@@ -59,8 +72,8 @@ public class Mesh {
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		
 		idxVbo = GL15.glGenBuffers();
-		IntBuffer indBuffer = MemoryUtil.memAllocInt(inds.length);
-		indBuffer.put(inds).flip();
+		IntBuffer indBuffer = MemoryUtil.memAllocInt(tris.length);
+		indBuffer.put(tris).flip();
 		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, idxVbo);
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indBuffer, GL15.GL_STATIC_DRAW);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);

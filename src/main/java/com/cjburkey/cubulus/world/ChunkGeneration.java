@@ -28,7 +28,7 @@ public final class ChunkGeneration {
 	private static Block getBlockAt(Vector3f pos) {
 		pos.mul((float) scale);
 		double noise = SimplexNoise.noise(pos.x, pos.y, pos.z);
-		return (noise >= 0.5d) ? Blocks.blockStone : null;
+		return (noise >= 0.3d) ? Blocks.blockStone : null;
 	}
 	
 }

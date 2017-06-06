@@ -3,6 +3,7 @@ package com.cjburkey.cubulus.io;
 import org.joml.Vector2i;
 import com.cjburkey.cubulus.block.Block;
 
+@SuppressWarnings("unused")
 public class TextureAtlas {
 	
 	private int width = 1;

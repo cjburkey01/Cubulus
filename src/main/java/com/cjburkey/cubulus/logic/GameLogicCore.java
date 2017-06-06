@@ -36,7 +36,6 @@ public final class GameLogicCore implements IGameLogic {
 	
 	public GameLogicCore() {
 		instance = this;
-		world = new ChunkHandler();
 	}
 	
 	private void startGeneration() {
@@ -52,7 +51,7 @@ public final class GameLogicCore implements IGameLogic {
 			Vector2f rot = Cubulus.getGameWindow().getInput().getMouseHandler().getDisplayVector();
 			cam.rotate(rot.x * CAM_ROT_SPEED, rot.y * CAM_ROT_SPEED, 0);
 			cam.getRotation().x = Utils.clamp(cam.getRotation().x, -90, 90);
-			world.ensureChunksAround(cam.getPosition(), 3);
+			world.ensureChunksAround(cam.getPosition(), 5);
 		}
 	}
 	
@@ -84,6 +83,7 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void removeGameObject(GameObject obj) {
+		Cubulus.getInstance().runLater(() -> obj.getMesh().cleanUp());
 		gameObjects.remove(obj);
 	}
 	
@@ -122,6 +122,7 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void onGameCleanup() {
+		world.stop();
 		gameObjects.clear();
 		Dirs.cleanup();
 	}

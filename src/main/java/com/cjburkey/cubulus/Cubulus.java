@@ -100,7 +100,7 @@ public final class Cubulus {
 	
 	private void finish() {
 		System.out.println("\n----------[ Begin Game ]----------\n");
-		logicEvents.gameInit();
+		// logic.gameInit();
 		startRenderLoop();
 		logger.info("Render loop closed.");
 		logger.info("Stopped.");

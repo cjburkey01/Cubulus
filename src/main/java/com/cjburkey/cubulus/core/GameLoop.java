@@ -37,11 +37,16 @@ public final class GameLoop {
 			this.update = update;
 		}
 		
+		private boolean first = true;
 		public void run() {
 			long lastUpdate = System.nanoTime();
 			long lastSecond = System.currentTimeMillis();
 			int updates = 0;
 			while(running) {
+				if(first) {
+					first = false;
+					Cubulus.getCoreEventDispatcherForLogicEvents().gameInit();
+				}
 				long nowUpdate = System.nanoTime();
 				long nowSecond = System.currentTimeMillis();
 				if(nowUpdate - lastUpdate >= step) {
