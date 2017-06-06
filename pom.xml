@@ -13,8 +13,8 @@
 		<steamworks4j.version>1.6.2</steamworks4j.version>
 		<reflections.version>0.9.11</reflections.version>
 		<pngdecoder.version>1.0</pngdecoder.version>
+		<commonslang.version>3.5</commonslang.version>
 	</properties>
-	
 	<dependencies>
 		<dependency>
 			<groupId>org.lwjgl</groupId>
@@ -295,8 +295,13 @@
 			<groupId>org.l33tlabs.twl</groupId>
 			<artifactId>pngdecoder</artifactId>
 			<version>${pngdecoder.version}</version>
-			</dependency>
-		</dependencies>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commonslang.version}</version>
+		</dependency>
+	</dependencies>
 	<repositories>
 		<repository>
 			<id>sonatype-snapshots</id>

@@ -18,8 +18,12 @@ public final class Blocks {
 	
 	public static void initBlocks() {
 		Cubulus.info("Initializing blocks...");
-		blockStone = addBlock(new Block("block_stone", "cubulus:texture/block/block_stone.png"));
+		blockStone = addBlock(new Block("block_stone", "cubulus:texture/block/block_stone.png", true));
 		Cubulus.info("Initialized blocks.");
+	}
+	
+	public static Block[] getAllBlocks() {
+		return blocks.toArray(new Block[blocks.size()]);
 	}
 	
 }

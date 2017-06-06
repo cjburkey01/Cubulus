@@ -8,42 +8,52 @@ import org.lwjgl.glfw.GLFW;
 import com.cjburkey.cubulus.Cubulus;
 import com.cjburkey.cubulus.Utils;
 import com.cjburkey.cubulus.block.Blocks;
-import com.cjburkey.cubulus.chunk.MeshChunk;
+import com.cjburkey.cubulus.chunk.ChunkHandler;
 import com.cjburkey.cubulus.core.GameStateHandler;
 import com.cjburkey.cubulus.event.EventHandler;
+import com.cjburkey.cubulus.fun.AsciiMessage;
 import com.cjburkey.cubulus.input.KeyboardHandler;
 import com.cjburkey.cubulus.input.MouseHandler;
+import com.cjburkey.cubulus.io.Dirs;
+import com.cjburkey.cubulus.io.TextureAtlas;
 import com.cjburkey.cubulus.object.GameObject;
-import com.cjburkey.cubulus.object.Mesh;
+import com.cjburkey.cubulus.render.Camera;
 import com.cjburkey.cubulus.render.Renderer;
 import com.cjburkey.cubulus.window.Window;
 
 public final class GameLogicCore implements IGameLogic {
 	
+	private static GameLogicCore instance;
+	private List<GameObject> gameObjects = new ArrayList<>();
+	
+	private TextureAtlas texture;
+	private ChunkHandler world;
 	private Renderer renderer;
-	private List<GameObject> gameItems = new ArrayList<>();
 	private final Vector3f cameraInc = new Vector3f();
 	private final float CAM_MOVE_SPEED = 0.1f;
 	private final float CAM_ROT_SPEED = 0.25f;
+	private boolean ascii = false;
 	
 	public GameLogicCore() {
-		MeshChunk chunk = new MeshChunk("cubulus:texture/block/block_stone.png");
-		spawnChunk(new Vector3f(0, 0, 0), chunk);
+		instance = this;
+		world = new ChunkHandler();
 	}
 	
-	private void spawnChunk(Vector3f pos, Mesh mesh) {
-		GameObject item = new GameObject(mesh);
-		item.setPosition(pos.x, pos.y, pos.z);
-		gameItems.add(item);
+	private void startGeneration() {
+		Cubulus.info("Starting generation system");
+		world = new ChunkHandler();
 	}
 	
 	public void onGameUpdate() {
-		if(renderer != null && renderer.getCamera() != null) {
+		Camera cam = renderer.getCamera();
+		if(renderer != null && cam != null) {
 			processInput(Cubulus.getGameWindow(), Cubulus.getGameWindow().getInput().getMouseHandler(), Cubulus.getGameWindow().getInput().getKeyboardHandler());
-			renderer.getCamera().move(cameraInc.x * CAM_MOVE_SPEED, cameraInc.y * CAM_MOVE_SPEED, cameraInc.z * CAM_MOVE_SPEED);
+			cam.move(cameraInc.x * CAM_MOVE_SPEED, cameraInc.y * CAM_MOVE_SPEED, cameraInc.z * CAM_MOVE_SPEED);
 			Vector2f rot = Cubulus.getGameWindow().getInput().getMouseHandler().getDisplayVector();
-			renderer.getCamera().rotate(rot.x * CAM_ROT_SPEED, rot.y * CAM_ROT_SPEED, 0);
-			renderer.getCamera().getRotation().x = Utils.clamp(renderer.getCamera().getRotation().x, -90, 90);
+			cam.rotate(rot.x * CAM_ROT_SPEED, rot.y * CAM_ROT_SPEED, 0);
+			cam.getRotation().x = Utils.clamp(cam.getRotation().x, -90, 90);
+			Thread t = new Thread(() -> world.ensureChunksAround(cam.getPosition(), 3));
+			t.start();
 		}
 	}
 	
@@ -70,16 +80,33 @@ public final class GameLogicCore implements IGameLogic {
 		}
 	}
 	
+	public void addGameObject(GameObject obj) {
+		gameObjects.add(obj);
+	}
+	
+	public void removeGameObject(GameObject obj) {
+		gameObjects.remove(obj);
+	}
+	
 	public void onGameInit() {
-		Cubulus.info("Initialized core game.");
-		Blocks.initBlocks();
-		GameStateHandler.unPause();
-		Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_DOWN_EVENT, (data) -> onKeyDown(data.getLong("window"), data.getInt("key")));
-		Cubulus.getGameWindow().getInput().getMouseHandler().init(Cubulus.getGameWindow());
+		try {
+			Cubulus.info("Initialized core game.");
+			if(ascii) ascii();
+			Dirs.init();
+			Blocks.initBlocks();
+			texture = new TextureAtlas();
+			Cubulus.getGameWindow().getInput().getMouseHandler().resetCursorPosition();
+			Cubulus.getInstance().getEventHandler().addListener(EventHandler.KEY_DOWN_EVENT, (data) -> onKeyDown(data.getLong("window"), data.getInt("key")));
+			Cubulus.getGameWindow().getInput().getMouseHandler().init(Cubulus.getGameWindow());
+			
+			startGeneration();
+		} catch(Exception e) {
+			Cubulus.getInstance().error(-200, true, e);
+		}
 	}
 	
 	public void onRenderUpdate() {
-		renderer.render(gameItems.toArray(new GameObject[gameItems.size()]));
+		renderer.render(gameObjects.toArray(new GameObject[gameObjects.size()]));
 	}
 	
 	public void onRenderInit() {
@@ -88,14 +115,15 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void onRenderCleanup() {
-		for(GameObject item : gameItems) {
+		for(GameObject item : gameObjects) {
 			item.getMesh().cleanUp();
 		}
 		renderer.cleanup();
 	}
 	
 	public void onGameCleanup() {
-		gameItems.clear();
+		gameObjects.clear();
+		Dirs.cleanup();
 	}
 	
 	public void onKeyDown(long window, int key) {
@@ -103,14 +131,6 @@ public final class GameLogicCore implements IGameLogic {
 			Cubulus.getInstance().closeGame();
 			return;
 		}
-		/*if(key == GLFW.GLFW_KEY_R) {
-			spawnMeshes(true);
-			return;
-		}
-		if(key == GLFW.GLFW_KEY_F) {
-			spawnMeshes(false);
-			return;
-		}*/
 		if(key == GLFW.GLFW_KEY_ESCAPE) {
 			if(GameStateHandler.isPaused()) {
 				GameStateHandler.unPause();
@@ -121,22 +141,20 @@ public final class GameLogicCore implements IGameLogic {
 		}
 	}
 	
-	/*private void asciiPrint() {
-		Cubulus.info("Printing some fun ascii text:");
-		String file = "/ascii.txt";
-		try {
-			Scanner scanner = new Scanner(getClass().getResourceAsStream(file));
-			List<String> output = new ArrayList<>();
-			while(scanner.hasNextLine()) {
-				output.add(scanner.nextLine());
-			}
-			scanner.close();
-			for(String s : output) {
-				System.out.println("\t" + s);
-			}
-		} catch(Exception e) {
-			Cubulus.getInstance().error(-2, false, e);
-		}
-	}*/
+	private void ascii() {
+		new AsciiMessage();
+	}
+	
+	public TextureAtlas getTextureAtlas() {
+		return texture;
+	}
+	
+	public ChunkHandler getWorld() {
+		return world;
+	}
+	
+	public static GameLogicCore getInstance() {
+		return instance;
+	}
 	
 }

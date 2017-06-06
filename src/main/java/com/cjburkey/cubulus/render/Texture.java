@@ -15,8 +15,11 @@ public final class Texture {
 	private int texture;
 	
 	public Texture(String path) {
+		this(path, ResourceHandler.getInstance().getStream(path));
+	}
+	
+	public Texture(String path, InputStream stream) {
 		try {
-			InputStream stream = ResourceHandler.getInstance().getStream(path);
 			decoder = new PNGDecoder(stream);
 			sendToGpu();
 		} catch (Exception e) {

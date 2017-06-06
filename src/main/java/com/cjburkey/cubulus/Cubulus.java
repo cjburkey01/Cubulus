@@ -1,5 +1,7 @@
 package com.cjburkey.cubulus;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
@@ -24,6 +26,7 @@ public final class Cubulus {
 	private EventHandler eventHandler;
 	private CoreEventDispatcher logicEvents;
 	private ResourceHandler resHandle;
+	private final List<Runnable> runLater = new ArrayList<>();
 	
 	public static void main(String[] args) {
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> instance.error(Short.MAX_VALUE, true, e));
@@ -36,6 +39,10 @@ public final class Cubulus {
 		}
 		instance = new Cubulus(log);
 		instance.start();
+	}
+	
+	public void runLater(Runnable r) {
+		runLater.add(r);
 	}
 	
 	public Cubulus(boolean fullLog) {
@@ -176,6 +183,10 @@ public final class Cubulus {
 			window.cancelResize();
 			GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
 		}
+		for(int i = 0; i < runLater.size(); i ++) {
+			runLater.get(i).run();
+		}
+		runLater.clear();
 		setBuiltWindowTitle();
 		logicEvents.renderUpdate();
 		GLFW.glfwSwapBuffers(window.getWindow());
@@ -202,49 +213,5 @@ public final class Cubulus {
 	public static CoreEventDispatcher getCoreEventDispatcherForLogicEvents() {
 		return instance.logicEvents;
 	}
-	
-	/*private void logicGameInit() {
-		window.getInput().getMouseHandler().init(window.getWindow());
-		for(IGameLogic l : logic) {
-			l.onGameInit();
-		}
-	}
-	
-	private void logicRenderInit() {
-		for(IGameLogic l : logic) {
-			l.onRenderInit();
-		}
-	}
-	
-	private boolean firstUpdate = true;
-	private void logicUpdate() {
-		if(firstUpdate) {
-			firstUpdate = false;
-			logicGameInit();
-		}
-		window.getInput().getMouseHandler().update();
-		for(IGameLogic l : logic) {
-			l.onUpdate();
-		}
-	}
-	
-	private boolean firstRender = true;
-	private void logicRender() {
-		if(firstRender) {
-			firstRender = false;
-			GL11.glEnable(GL11.GL_DEPTH_TEST);
-			logicRenderInit();
-		}
-		for(IGameLogic l : logic) {
-			l.onRender();
-		}
-	}
-	
-	private void logicCleanup() {
-		
-		for(IGameLogic l : logic) {
-			l.onCleanup();
-		}
-	}*/
 	
 }

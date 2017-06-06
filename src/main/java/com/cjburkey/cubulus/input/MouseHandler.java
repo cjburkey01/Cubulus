@@ -23,7 +23,7 @@ public final class MouseHandler {
 	}
 	
 	public void init(Window window) {
-		GameStateHandler.resetCursorPosition();
+		resetCursorPosition();
 		GLFW.glfwSetCursorPosCallback(window.getWindow(), (w, x, y) -> {
 			if(!GameStateHandler.isPaused()) {
 				pos.x = x;
@@ -65,6 +65,20 @@ public final class MouseHandler {
 		}
 		prevPos.x = pos.x;
 		prevPos.y = pos.y;
+	}
+	
+	public void resetCursorPosition() {
+		Window w = Cubulus.getGameWindow();
+		GLFW.glfwSetCursorPos(w.getWindow(), (double) w.getWidth() / 2d, (double) w.getHeight() / 2d);
+		double[] x = new double[1];
+		double[] y = new double[1];
+		GLFW.glfwGetCursorPos(w.getWindow(), x, y);
+		Vector2f current = new Vector2f((float) x[0], (float) y[0]);
+		
+		pos.x = current.x;
+		pos.y = current.y;
+		prevPos.x = current.x;
+		prevPos.y = current.y;
 	}
 	
 	public Vector2f getDisplayVector() {

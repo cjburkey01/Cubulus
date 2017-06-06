@@ -45,11 +45,13 @@ public final class Renderer {
 		shaderBasic.setUniform("projectionMatrix", projectionMatrix);
 		shaderBasic.setUniform("texture_sampler", 0);
 		for(GameObject item : gameItems) {
-			Matrix4f modelViewMatrix = transform.getModelViewMatrix(item, viewMatrix);
-			shaderBasic.setUniform("modelViewMatrix", modelViewMatrix);
-			shaderBasic.setUniform("color", item.getMesh().getColor());
-			shaderBasic.setUniform("useColor", (item.getMesh().useColor()) ? 1 : 0);
-			item.getMesh().render();
+			if(item != null && item.getMesh() != null) {
+				Matrix4f modelViewMatrix = transform.getModelViewMatrix(item, viewMatrix);
+				shaderBasic.setUniform("modelViewMatrix", modelViewMatrix);
+				shaderBasic.setUniform("color", item.getMesh().getColor());
+				shaderBasic.setUniform("useColor", (item.getMesh().useColor()) ? 1 : 0);
+				item.getMesh().render();
+			}
 		}
 		shaderBasic.unbind();
 	}
