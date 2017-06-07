@@ -1,7 +1,7 @@
 package com.cjburkey.cubulus.logic;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -15,9 +15,6 @@ import com.cjburkey.cubulus.input.KeyboardHandler;
 import com.cjburkey.cubulus.input.MouseHandler;
 import com.cjburkey.cubulus.io.Dirs;
 import com.cjburkey.cubulus.io.TextureAtlas;
-import com.cjburkey.cubulus.light.DirectionalLight;
-import com.cjburkey.cubulus.light.PointLight;
-import com.cjburkey.cubulus.light.PointLight.Attenuation;
 import com.cjburkey.cubulus.object.GameObject;
 import com.cjburkey.cubulus.render.Camera;
 import com.cjburkey.cubulus.render.Renderer;
@@ -27,7 +24,7 @@ import com.cjburkey.cubulus.world.World;
 public final class GameLogicCore implements IGameLogic {
 	
 	private static GameLogicCore instance;
-	private List<GameObject> gameObjects = new ArrayList<>();
+	private Queue<GameObject> gameObjects = new ConcurrentLinkedQueue<>();
 	
 	private TextureAtlas texture;
 	private World world;
@@ -36,10 +33,6 @@ public final class GameLogicCore implements IGameLogic {
 	private final float CAM_MOVE_SPEED = 0.1f;
 	private final float CAM_ROT_SPEED = 0.25f;
 	private boolean ascii = false;
-	
-	private Vector3f ambientLight;
-	private PointLight pointLight;
-	private DirectionalLight directionalLight;
 	
 	public GameLogicCore() {
 		instance = this;
@@ -53,7 +46,7 @@ public final class GameLogicCore implements IGameLogic {
 			Vector2f rot = Cubulus.getGameWindow().getInput().getMouseHandler().getDisplayVector();
 			cam.rotate(rot.x * CAM_ROT_SPEED, rot.y * CAM_ROT_SPEED, 0);
 			cam.getRotation().x = Utils.clamp(cam.getRotation().x, -90, 90);
-			world.loadChunksAround(cam.getPosition(), World.loadRadius);
+			world.getChunkHandler().update(cam.getPosition(), 3);
 		}
 	}
 	
@@ -81,7 +74,9 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void addGameObject(GameObject obj) {
-		gameObjects.add(obj);
+		if(!gameObjects.contains(obj)) {
+			gameObjects.add(obj);
+		}
 	}
 	
 	public void removeGameObject(GameObject obj) {
@@ -89,8 +84,8 @@ public final class GameLogicCore implements IGameLogic {
 			if(obj != null && obj.getMesh() != null) {
 				obj.getMesh().cleanUp();
 			}
+			gameObjects.remove(obj);
 		});
-		gameObjects.remove(obj);
 	}
 	
 	public void onGameInit() {
@@ -112,30 +107,31 @@ public final class GameLogicCore implements IGameLogic {
 	}
 	
 	public void onRenderUpdate() {
-		renderer.render(gameObjects.toArray(new GameObject[gameObjects.size()]), ambientLight, pointLight, directionalLight);
+		if(world != null) {
+			world.getChunkHandler().render(renderer.getCamera().getPosition(), 3, 4);
+		}
+		renderer.render(gameObjects.toArray(new GameObject[gameObjects.size()]));
 	}
 	
 	public void onRenderInit() {
-		ambientLight = new Vector3f(1f, 1f, 1f);
-		pointLight = new PointLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(0, 0, 0), 100.0f, new Attenuation(1.0f, 0.0f, 0.0f));
-		directionalLight = new DirectionalLight(new Vector3f(1.0f, 1.0f, 1.0f), new Vector3f(-1.0f, -1.0f, 0.0f), 100.0f);
-		
 		GLFW.glfwFocusWindow(Cubulus.getGameWindow().getWindow());
 		renderer = new Renderer();
 		renderer.init();
 	}
 	
 	public void onRenderCleanup() {
+		world.getChunkHandler().renderCleanup();
 		for(GameObject item : gameObjects) {
 			if(item != null && item.getMesh() != null) {
 				item.getMesh().cleanUp();
 			}
 		}
+		gameObjects.clear();
 		renderer.cleanup();
 	}
 	
 	public void onGameCleanup() {
-		gameObjects.clear();
+		world.getChunkHandler().gameCleanup();
 		texture.cleanup();
 		Dirs.cleanup();
 	}

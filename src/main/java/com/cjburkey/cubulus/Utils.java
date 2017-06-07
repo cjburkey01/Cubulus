@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
+import org.joml.Vector3f;
 import com.cjburkey.cubulus.resource.ResourceHandler;
 
 public final class Utils {
@@ -46,6 +47,18 @@ public final class Utils {
 		if(value < min) return max;
 		if(value > max) return min;
 		return value;
+	}
+	
+	public static float distance(Vector3f from, Vector3f to) {
+		return from.distance(to);
+	}
+	
+	public static float distance(Vector3f from, float toX, float toY, float toZ) {
+		return from.distance(toX, toY, toZ);
+	}
+	
+	public static float distance(float fromX, float fromY, float fromZ, float toX, float toY, float toZ) {
+		return new Vector3f(fromX, fromY, fromZ).distance(toX, toY, toZ);
 	}
 	
 }

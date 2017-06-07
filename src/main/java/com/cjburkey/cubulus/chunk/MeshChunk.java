@@ -7,9 +7,9 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 import com.cjburkey.cubulus.block.Block;
 import com.cjburkey.cubulus.io.TextureAtlas;
-import com.cjburkey.cubulus.light.Material;
 import com.cjburkey.cubulus.logic.GameLogicCore;
 import com.cjburkey.cubulus.object.Mesh;
+import com.cjburkey.cubulus.render.Material;
 
 public final class MeshChunk {
 	
@@ -46,7 +46,7 @@ public final class MeshChunk {
 		float[] uvsArr = floatFromVec2List(uvs);
 		int[] indicesArr = intFromIntList(indices);
 		Mesh mesh = new Mesh(vertsArr, normsArr, uvsArr, indicesArr);
-		mesh.setMaterial(new Material(texture.getTexture()));
+		mesh.setMaterial(new Material(null, GameLogicCore.getInstance().getAtlas().getTexture()));
 		return mesh;
 	}
 	

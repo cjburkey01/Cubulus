@@ -13,6 +13,9 @@ import com.cjburkey.cubulus.event.EventHandler;
 import com.cjburkey.cubulus.resource.ResourceHandler;
 import com.cjburkey.cubulus.window.Window;
 
+// TODO:
+// TODO: FIX WORLD TURNING BLACK WHEN CAMERA MOVES
+// TODO:
 public final class Cubulus {
 	
 	private static final boolean vsync = true;	// Keep this on, if off, the game will jump a little bit every once in a while.

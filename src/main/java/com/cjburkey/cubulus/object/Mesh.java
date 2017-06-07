@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
-import com.cjburkey.cubulus.light.Material;
+import com.cjburkey.cubulus.render.Material;
 import com.cjburkey.cubulus.render.Texture;
 
 public class Mesh {
@@ -21,13 +21,13 @@ public class Mesh {
 	private Material material;
 	
 	private final float[] verts;
-	private final float[] norms;
+	//private final float[] norms;
 	private final float[] uvs;
 	private final int[] tris;
 	
 	public Mesh(float[] verts, float[] normals, float[] uvs, int[] inds) {
 		this.verts = verts;
-		this.norms = normals;
+		//this.norms = normals;
 		this.uvs = uvs;
 		tris = inds;
 	}
@@ -35,7 +35,6 @@ public class Mesh {
 	public void build() {
 		FloatBuffer posBuffer = null;
 		FloatBuffer textCoordsBuffer = null;
-		FloatBuffer vecNormalsBuffer = null;
 		IntBuffer indicesBuffer = null;
 		try {
 			vertexCount = tris.length;
@@ -61,14 +60,6 @@ public class Mesh {
 			
 			vboId = GL15.glGenBuffers();
 			vboIdList.add(vboId);
-			vecNormalsBuffer = MemoryUtil.memAllocFloat(norms.length);
-			vecNormalsBuffer.put(norms).flip();
-			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
-			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vecNormalsBuffer, GL15.GL_STATIC_DRAW);
-			GL20.glVertexAttribPointer(2, 3, GL11.GL_FLOAT, false, 0, 0);
-			
-			vboId = GL15.glGenBuffers();
-			vboIdList.add(vboId);
 			indicesBuffer = MemoryUtil.memAllocInt(tris.length);
 			indicesBuffer.put(tris).flip();
 			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId);
@@ -82,9 +73,6 @@ public class Mesh {
 			}
 			if(textCoordsBuffer != null) {
 				MemoryUtil.memFree(textCoordsBuffer);
-			}
-			if(vecNormalsBuffer != null) {
-				MemoryUtil.memFree(vecNormalsBuffer);
 			}
 			if(indicesBuffer != null) {
 				MemoryUtil.memFree(indicesBuffer);
@@ -118,15 +106,13 @@ public class Mesh {
 		GL30.glBindVertexArray(getVaoId());
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
-		//GL20.glEnableVertexAttribArray(2);
 		
 		GL11.glDrawElements(GL11.GL_TRIANGLES, getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 		
 		GL20.glDisableVertexAttribArray(0);
 		GL20.glDisableVertexAttribArray(1);
-		//GL20.glDisableVertexAttribArray(2);
 		GL30.glBindVertexArray(0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+		//GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 	}
 	
 	public void cleanUp() {
@@ -137,6 +123,7 @@ public class Mesh {
 			GL15.glDeleteBuffers(vboId);
 		}
 		
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 		Texture texture = material.getTexture();
 		if(texture != null) {
 			texture.cleanup();
