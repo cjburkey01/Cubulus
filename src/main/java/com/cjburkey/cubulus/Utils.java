@@ -11,7 +11,7 @@ public final class Utils {
 	
 	public static String loadResourceAsString(String loc) throws Exception {
 		StringBuilder out = new StringBuilder();
-		Scanner scanner = new Scanner(ResourceHandler.getInstance().getStream(loc));
+		Scanner scanner = new Scanner(ResourceHandler.getStream(loc));
 		while(scanner.hasNextLine()) {
 			out.append(scanner.nextLine() + '\n');
 		}
@@ -21,7 +21,7 @@ public final class Utils {
 	
 	public static List<String> loadResourceAsLines(String loc) throws Exception {
 		List<String> out = new ArrayList<>();
-		Scanner scanner = new Scanner(ResourceHandler.getInstance().getStream(loc));
+		Scanner scanner = new Scanner(ResourceHandler.getStream(loc));
 		while(scanner.hasNextLine()) {
 			out.add(scanner.nextLine() + '\n');
 		}
