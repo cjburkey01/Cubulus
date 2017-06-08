@@ -15,8 +15,8 @@ public final class ResourceHandler {
 		return getPath(location) != null;
 	}
 	
-	private static String getPath(String location) {
-		String[] split = location.split(location);
+	public static String getPath(String location) {
+		String[] split = location.split(":");
 		if(split.length == 2) {
 			return "/" + split[0] + "/" + split[1];
 		}

@@ -29,7 +29,7 @@ public final class CoreModuleHandler {
 	private boolean registerModule(Class<? extends ICoreModule> moduleClass) {
 		if(!isModuleLoaded(moduleClass)) {
 			ICoreModule mod = instantiateClass(moduleClass);
-			Cubulus.getLogger().info("Loaded game module: \"" + mod.getModuleName() + "\"");
+			Cubulus.info("Loaded CoreModule: \"" + mod.getModuleName() + "\"");
 			return loadedModules.add(mod);
 		}
 		return false;
@@ -58,24 +58,32 @@ public final class CoreModuleHandler {
 	}
 	
 	public class EventSystem {
-		public void gameInit() {
-			loadedModules.forEach(e -> e.onGameInit());
-		}
-
 		public void glfwInit() {
-			loadedModules.forEach(e -> e.onGlfwInit());
+			loadedModules.forEach(e -> e.onGlfwInit(Cubulus.onRenderThread()));
 		}
 		
 		public void renderInit() {
-			loadedModules.forEach(e -> e.onRenderInit());
+			loadedModules.forEach(e -> e.onRenderInit(Cubulus.onRenderThread()));
 		}
 		
-		public void gameTick() {
-			loadedModules.forEach(e -> e.onGameTick());
+		public void gameInit() {
+			loadedModules.forEach(e -> e.onGameInit(Cubulus.onRenderThread()));
 		}
 		
 		public void renderUpdate() {
-			loadedModules.forEach(e -> e.onRenderUpdate());
+			loadedModules.forEach(e -> e.onRenderUpdate(Cubulus.onRenderThread()));
+		}
+		
+		public void gameTick() {
+			loadedModules.forEach(e -> e.onGameTick(Cubulus.onRenderThread()));
+		}
+		
+		public void renderCleanup() {
+			loadedModules.forEach(e -> e.onRenderCleanup(Cubulus.onRenderThread()));
+		}
+		
+		public void gameCleanup() {
+			loadedModules.forEach(e -> e.onGameCleanup(Cubulus.onRenderThread()));
 		}
 	}
 	

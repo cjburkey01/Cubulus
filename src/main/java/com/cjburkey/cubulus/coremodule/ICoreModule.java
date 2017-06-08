@@ -6,11 +6,13 @@ public abstract class ICoreModule {
 		return getClass().getSimpleName();
 	}
 
-	public abstract void onGameInit();
-	public abstract void onGlfwInit();
-	public abstract void onRenderInit();
-	public abstract void onGameTick();
-	public abstract void onRenderUpdate();
+	public abstract void onGlfwInit(boolean onRenderThread);
+	public abstract void onRenderInit(boolean onRenderThread);
+	public abstract void onGameInit(boolean onRenderThread);
+	public abstract void onRenderUpdate(boolean onRenderThread);
+	public abstract void onGameTick(boolean onRenderThread);
+	public abstract void onRenderCleanup(boolean onRenderThread);
+	public abstract void onGameCleanup(boolean onRenderThread);
 	
 	public boolean equals(Object other) {
 		return ((other != null) && (other instanceof ICoreModule) && (other.getClass().equals(getClass())));

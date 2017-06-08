@@ -1,25 +1,47 @@
 package com.cjburkey.cubulus.coremodule;
 
-public class CoreModuleMainGame extends ICoreModule {
+import com.cjburkey.cubulus.Cubulus;
+import com.cjburkey.cubulus.lwjgl.Renderer;
+
+public final class CoreModuleMainGame extends ICoreModule {
 	
-	public void onGameInit() {
+	private Renderer renderer;
+	
+	public void onGlfwInit(boolean onRenderThread) {
+		Cubulus.info("GLFW Init");
+	}
+	
+	public void onRenderInit(boolean onRenderThread) {
+		Cubulus.info("Render Init");
+		
+		renderer = new Renderer();
+		try {
+			renderer.init();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void onGameInit(boolean onRenderThread) {
+		Cubulus.info("Game Init");
+	}
+	
+	public void onRenderUpdate(boolean onRenderThread) {
+		renderer.render();
+	}
+	
+	public void onGameTick(boolean onRenderThread) {
 		
 	}
 	
-	public void onGlfwInit() {
+	public void onRenderCleanup(boolean onRenderThread) {
+		Cubulus.info("Render cleanup");
 		
+		renderer.cleanup();
 	}
 	
-	public void onRenderInit() {
-		
-	}
-	
-	public void onGameTick() {
-		
-	}
-	
-	public void onRenderUpdate() {
-		
+	public void onGameCleanup(boolean onRenderThread) {
+		Cubulus.info("Game cleanup");
 	}
 	
 }
