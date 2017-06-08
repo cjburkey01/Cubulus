@@ -1,4 +1,4 @@
-package com.cjburkey.cubulus.module;
+package com.cjburkey.cubulus.coremodule;
 
 import java.util.Queue;
 import java.util.Set;
@@ -6,37 +6,37 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.reflections.Reflections;
 import com.cjburkey.cubulus.Cubulus;
 
-public final class ModuleHandler {
+public final class CoreModuleHandler {
 	
-	private final Queue<IModule> loadedModules;
+	private final Queue<ICoreModule> loadedModules;
 	private final EventSystem events;
 	private final Reflections reflections;
 	
-	public ModuleHandler() {
-		loadedModules = new ConcurrentLinkedQueue<IModule>();
+	public CoreModuleHandler() {
+		loadedModules = new ConcurrentLinkedQueue<ICoreModule>();
 		events = new EventSystem();
 		reflections = new Reflections("");
 	}
 	
 	public void findAndLoadModules() {
 		loadedModules.clear();
-		Set<Class<? extends IModule>> classes = reflections.getSubTypesOf(IModule.class);
-		for(Class<? extends IModule> clazz : classes) {
+		Set<Class<? extends ICoreModule>> classes = reflections.getSubTypesOf(ICoreModule.class);
+		for(Class<? extends ICoreModule> clazz : classes) {
 			registerModule(clazz);
 		}
 	}
 	
-	private boolean registerModule(Class<? extends IModule> moduleClass) {
+	private boolean registerModule(Class<? extends ICoreModule> moduleClass) {
 		if(!isModuleLoaded(moduleClass)) {
-			IModule mod = instantiateClass(moduleClass);
+			ICoreModule mod = instantiateClass(moduleClass);
 			Cubulus.getLogger().info("Loaded game module: \"" + mod.getModuleName() + "\"");
 			return loadedModules.add(mod);
 		}
 		return false;
 	}
 	
-	private boolean isModuleLoaded(Class<? extends IModule> moduleClass) {
-		for(IModule m : loadedModules) {
+	private boolean isModuleLoaded(Class<? extends ICoreModule> moduleClass) {
+		for(ICoreModule m : loadedModules) {
 			if(m.equals(instantiateClass(moduleClass))) {
 				return true;
 			}
@@ -44,7 +44,7 @@ public final class ModuleHandler {
 		return false;
 	}
 	
-	private IModule instantiateClass(Class<? extends IModule> moduleClass) {
+	private ICoreModule instantiateClass(Class<? extends ICoreModule> moduleClass) {
 		try {
 			return moduleClass.newInstance();
 		} catch(Exception e) {

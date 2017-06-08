@@ -1,6 +1,6 @@
-package com.cjburkey.cubulus.module;
+package com.cjburkey.cubulus.coremodule;
 
-public class ModuleMainGame extends IModule {
+public class CoreModuleMainGame extends ICoreModule {
 	
 	public void onGameInit() {
 		

@@ -1,6 +1,6 @@
-package com.cjburkey.cubulus.module;
+package com.cjburkey.cubulus.coremodule;
 
-public abstract class IModule {
+public abstract class ICoreModule {
 	
 	public String getModuleName() {
 		return getClass().getSimpleName();
@@ -13,7 +13,7 @@ public abstract class IModule {
 	public abstract void onRenderUpdate();
 	
 	public boolean equals(Object other) {
-		return ((other != null) && (other instanceof IModule) && (other.getClass().equals(getClass())));
+		return ((other != null) && (other instanceof ICoreModule) && (other.getClass().equals(getClass())));
 	}
 	
 }

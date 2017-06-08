@@ -11,12 +11,12 @@ public final class Logger {
 	}
 	
 	public Logger() {
-		this("[Cubulus] %s");
+		this("[Cubulus-%s] %s");
 	}
 	
 	public void log(PrintStream stream, Object msg) {
 		String out = (msg == null) ? "null" : msg.toString();
-		stream.println(String.format(format, out));
+		stream.println(String.format(format, Thread.currentThread().getName(), out));
 	}
 	
 	public void info(Object msg) {
