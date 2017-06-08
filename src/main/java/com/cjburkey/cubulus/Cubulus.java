@@ -1,5 +1,6 @@
 package com.cjburkey.cubulus;
 
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.lwjgl.Version;
 import org.lwjgl.opengl.GL11;
@@ -7,6 +8,7 @@ import com.cjburkey.cubulus.coremodule.CoreModuleHandler;
 import com.cjburkey.cubulus.loop.GameLoop;
 import com.cjburkey.cubulus.loop.RenderLoop;
 import com.cjburkey.cubulus.lwjgl.GLFWWindow;
+import com.cjburkey.cubulus.lwjgl.GLHandler;
 
 public final class Cubulus {
 	
